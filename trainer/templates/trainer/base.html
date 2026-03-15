@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}English Trainer{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f4f8;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.35rem;
+            letter-spacing: -.5px;
+        }
+        .card {
+            border: none;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.08);
+        }
+        .card-header {
+            border-radius: 14px 14px 0 0 !important;
+            font-weight: 600;
+        }
+        .stat-card {
+            border-left: 5px solid;
+            transition: transform .15s;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .word-badge {
+            font-size: .75rem;
+            padding: .25em .6em;
+        }
+        .nav-link { font-weight: 500; }
+        .btn { border-radius: 8px; }
+        .progress { border-radius: 99px; }
+        footer { border-top: 1px solid #dee2e6; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'index' %}">
+            <i class="bi bi-book-fill me-1"></i>English Trainer
+        </a>
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav ms-auto gap-1">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'index' %}">
+                        <i class="bi bi-house-door"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'word_list' %}">
+                        <i class="bi bi-list-ul"></i> Words
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'word_create' %}">
+                        <i class="bi bi-plus-circle"></i> Add Word
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-warning btn-sm text-dark px-3 ms-2" href="{% url 'quiz_start' %}">
+                        <i class="bi bi-lightning-fill"></i> Quiz
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+</div>
+
+<footer class="text-center text-muted py-3 mt-3">
+    <small><i class="bi bi-book me-1"></i>English Trainer &copy; 2025</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>
