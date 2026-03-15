@@ -1,0 +1,126 @@
+{% extends "trainer/base.html" %}
+{% block title %}English Trainer — Home{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-primary text-white p-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="fw-bold mb-1">
+                        <i class="bi bi-stars me-2"></i>English Trainer
+                    </h1>
+                    <p class="mb-3 opacity-75">
+                        Learn English vocabulary with spaced repetition and interactive quizzes.
+                    </p>
+                    <a href="{% url 'quiz_start' %}" class="btn btn-warning btn-lg fw-bold me-2">
+                        <i class="bi bi-lightning-fill me-1"></i>Start Quiz
+                    </a>
+                    <a href="{% url 'word_create' %}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-plus-lg me-1"></i>Add Words
+                    </a>
+                </div>
+                <div class="col-md-4 text-center d-none d-md-block">
+                    <i class="bi bi-translate" style="font-size: 6rem; opacity: .3;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-4">
+        <div class="card stat-card border-primary h-100 p-3">
+            <div class="text-muted small mb-1">Total words</div>
+            <div class="fs-2 fw-bold text-primary">{{ total_words }}</div>
+            <div class="text-muted small">in your dictionary</div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card stat-card border-success h-100 p-3">
+            <div class="text-muted small mb-1">Overall accuracy</div>
+            <div class="fs-2 fw-bold text-success">{{ overall_accuracy }}%</div>
+            <div class="text-muted small">correct answers</div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card stat-card border-info h-100 p-3">
+            <div class="text-muted small mb-1">Times practiced</div>
+            <div class="fs-2 fw-bold text-info">{{ total_shown }}</div>
+            <div class="text-muted small">total attempts</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Recent words -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-clock-history me-2 text-primary"></i>Recently Added</span>
+                <a href="{% url 'word_list' %}" class="btn btn-sm btn-outline-primary">
+                    View all
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_words %}
+                    <ul class="list-group list-group-flush">
+                        {% for word in recent_words %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <a href="{% url 'word_detail' word.pk %}" class="fw-semibold text-decoration-none">
+                                    {{ word.english }}
+                                </a>
+                                <span class="text-muted ms-2">— {{ word.russian }}</span>
+                            </div>
+                            <span class="badge bg-{{ word.accuracy_color }} word-badge">
+                                {{ word.accuracy }}%
+                            </span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                        No words yet.
+                        <a href="{% url 'word_create' %}">Add your first word!</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Hardest words -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-white">
+                <i class="bi bi-fire me-2 text-danger"></i>Hardest Words
+            </div>
+            <div class="card-body p-0">
+                {% if hardest_words %}
+                    <ul class="list-group list-group-flush">
+                        {% for word in hardest_words %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <a href="{% url 'word_detail' word.pk %}" class="fw-semibold text-decoration-none">
+                                    {{ word.english }}
+                                </a>
+                                <span class="text-muted ms-2">— {{ word.russian }}</span>
+                            </div>
+                            <span class="badge bg-danger word-badge">{{ word.accuracy }}%</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-check-circle fs-2 d-block mb-2 text-success"></i>
+                        No data yet — start a quiz!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
