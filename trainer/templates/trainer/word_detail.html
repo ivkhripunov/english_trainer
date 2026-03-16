@@ -1,0 +1,75 @@
+{% extends "trainer/base.html" %}
+{% block title %}{{ word.english }} — English Trainer{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'word_list' %}">Words</a></li>
+        <li class="breadcrumb-item active">{{ word.english }}</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <span class="fw-bold fs-5">
+                    <i class="bi bi-card-text me-2 text-primary"></i>Word Card
+                </span>
+                <div>
+                    <a href="{% url 'word_edit' word.pk %}" class="btn btn-sm btn-outline-primary me-1">
+                        <i class="bi bi-pencil me-1"></i>Edit
+                    </a>
+                    <a href="{% url 'word_delete' word.pk %}" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-trash me-1"></i>Delete
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-4 text-center">
+                <div class="display-5 fw-bold text-primary mb-2">{{ word.english }}</div>
+                <div class="fs-3 text-muted mb-3">{{ word.russian }}</div>
+                {% if word.example %}
+                    <div class="bg-light rounded p-3 fst-italic text-muted">
+                        <i class="bi bi-quote me-1"></i>{{ word.example }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-white">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="fw-bold fs-5">{{ word.times_shown }}</div>
+                        <div class="text-muted small">Shown</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold fs-5 text-success">{{ word.times_correct }}</div>
+                        <div class="text-muted small">Correct</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold fs-5">
+                            <span class="badge bg-{{ word.accuracy_color }} fs-6">
+                                {{ word.accuracy }}%
+                            </span>
+                        </div>
+                        <div class="text-muted small">Accuracy</div>
+                    </div>
+                </div>
+                {% if word.times_shown > 0 %}
+                <div class="progress mt-3" style="height: 8px;">
+                    <div class="progress-bar bg-{{ word.accuracy_color }}"
+                         style="width: {{ word.accuracy }}%"></div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <a href="{% url 'word_list' %}" class="btn btn-outline-secondary me-2">
+                <i class="bi bi-arrow-left me-1"></i>Back to list
+            </a>
+            <a href="{% url 'quiz_start' %}" class="btn btn-warning">
+                <i class="bi bi-lightning-fill me-1"></i>Practice now
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
