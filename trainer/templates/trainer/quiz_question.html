@@ -1,0 +1,89 @@
+{% extends "trainer/base.html" %}
+{% block title %}Question {{ current }}/{{ total }} — English Trainer{% endblock %}
+
+{% block extra_css %}
+<style>
+    .quiz-card {
+        min-height: 320px;
+    }
+    .question-text {
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -.5px;
+    }
+    .direction-badge {
+        font-size: .8rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+
+        <!-- Progress bar -->
+        <div class="mb-3">
+            <div class="d-flex justify-content-between text-muted small mb-1">
+                <span>Question {{ current }} of {{ total }}</span>
+                <span>{{ progress }}% complete</span>
+            </div>
+            <div class="progress" style="height: 10px;">
+                <div class="progress-bar bg-warning" style="width: {{ progress }}%;"></div>
+            </div>
+        </div>
+
+        <div class="card quiz-card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <span class="fw-semibold text-muted">
+                    <i class="bi bi-lightning-fill text-warning me-1"></i>Quiz
+                </span>
+                <span class="badge bg-light text-dark direction-badge border">
+                    {% if direction == 'en_ru' %}
+                        🇬🇧 English → Russian 🇷🇺
+                    {% else %}
+                        🇷🇺 Russian → English 🇬🇧
+                    {% endif %}
+                </span>
+            </div>
+            <div class="card-body p-4 d-flex flex-column align-items-center justify-content-center text-center">
+                <p class="text-muted small mb-2">Translate this word:</p>
+                <div class="question-text text-primary mb-4">{{ question }}</div>
+
+                <form method="post" class="w-100">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ form.answer }}
+                        {% if form.answer.errors %}
+                            {% for error in form.answer.errors %}
+                                <div class="text-danger small mt-2">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="bi bi-arrow-right-circle me-1"></i>Submit
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <a href="{% url 'quiz_start' %}" class="text-muted small text-decoration-none">
+                <i class="bi bi-x-circle me-1"></i>Quit quiz
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-focus on the input field
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.querySelector('input[name="answer"]');
+        if (input) input.focus();
+    });
+</script>
+{% endblock %}
