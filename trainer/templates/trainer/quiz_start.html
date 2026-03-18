@@ -1,0 +1,57 @@
+{% extends "trainer/base.html" %}
+{% block title %}Start Quiz — English Trainer{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="text-center mb-4">
+            <i class="bi bi-lightning-fill text-warning" style="font-size: 3rem;"></i>
+            <h2 class="fw-bold mt-2">Start a Quiz</h2>
+            <p class="text-muted">Test your vocabulary knowledge</p>
+        </div>
+
+        {% if can_start %}
+        <div class="card">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-sliders me-2 text-primary"></i>Quiz Settings
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="mb-4">
+                        <label for="{{ field.id_for_label }}" class="form-label fw-semibold">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    <div class="d-grid mt-3">
+                        <button type="submit" class="btn btn-warning btn-lg fw-bold">
+                            <i class="bi bi-play-fill me-1"></i>Let's Go!
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-muted small text-center">
+                You have <strong>{{ word_count }}</strong> word{{ word_count|pluralize }} in your dictionary
+            </div>
+        </div>
+        {% else %}
+        <div class="card text-center py-5">
+            <i class="bi bi-journal-x text-muted fs-1 mb-3"></i>
+            <h5 class="text-muted">No words to practice yet</h5>
+            <p class="text-muted small">Add at least one word to your vocabulary first.</p>
+            <a href="{% url 'word_create' %}" class="btn btn-primary mt-2 mx-auto" style="width: fit-content;">
+                <i class="bi bi-plus-lg me-1"></i>Add Words
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
