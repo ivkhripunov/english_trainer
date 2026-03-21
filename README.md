@@ -1,4 +1,4 @@
-# 🇬🇧 English Trainer
+# English Trainer
 
 Веб-приложение для изучения английской лексики с карточками и квизами.
 Написано на Python/Django в рамках учебного проекта.
@@ -22,12 +22,12 @@
 
 ```bash
 # 1. Клонировать репозиторий
-git clone https://github.com/<your-username>/english-trainer.git
+git clone git@github.com:ivkhripunov/english_trainer.git
 cd english-trainer
 
 # 2. Создать виртуальное окружение
 python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+source venv/bin/activate
 
 # 3. Установить зависимости
 pip install -r requirements.txt
@@ -68,4 +68,4 @@ english_trainer/
 
 ## Автор
 
-Учебный проект по курсу "Разработка Web-приложения на Django".
+Иван Хрипунов, М03-503а
