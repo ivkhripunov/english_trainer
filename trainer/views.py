@@ -1,13 +1,20 @@
 """Views for the English trainer application."""
+import json
 import random
+import urllib.request
+import urllib.parse
+import urllib.error
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.http import JsonResponse
 from django.db.models import Q, Sum, F, FloatField, ExpressionWrapper
+from django.utils import timezone
 
-from .models import Word, Collection, Language
+from .models import Word, Collection, Language, QuizResult
 from .forms import WordForm, QuizAnswerForm, QuizSettingsForm, CollectionForm, LanguageForm
 
 MIN_WORDS_FOR_QUIZ = 1
+API_TIMEOUT = 5
 
 
 # ── Home ──────────────────────────────────────────────────────────────────────
@@ -53,6 +60,151 @@ def index(request):
     return render(request, 'trainer/index.html', context)
 
 
+# ── Profile ───────────────────────────────────────────────────────────────────
+
+def profile(request):
+    """Render the user profile page with learning statistics."""
+    total_words = Word.objects.count()
+    total_quizzes = QuizResult.objects.count()
+    recent_quizzes = QuizResult.objects.select_related('collection__language')[:10]
+
+    aggregates = Word.objects.aggregate(
+        total_shown=Sum('times_shown'),
+        total_correct=Sum('times_correct'),
+    )
+    total_shown = aggregates['total_shown'] or 0
+    total_correct = aggregates['total_correct'] or 0
+    overall_accuracy = (
+        round(total_correct / total_shown * 100) if total_shown > 0 else 0
+    )
+
+    quiz_aggregates = QuizResult.objects.aggregate(
+        total_score=Sum('score'),
+        total_questions=Sum('total'),
+    )
+    quiz_total_score = quiz_aggregates['total_score'] or 0
+    quiz_total_questions = quiz_aggregates['total_questions'] or 0
+    quiz_accuracy = (
+        round(quiz_total_score / quiz_total_questions * 100)
+        if quiz_total_questions > 0 else 0
+    )
+
+    best_collection = (
+        Collection.objects.filter(words__times_shown__gt=0)
+        .annotate(
+            acc=ExpressionWrapper(
+                Sum('words__times_correct') * 100.0 / Sum('words__times_shown'),
+                output_field=FloatField(),
+            )
+        )
+        .order_by('-acc')
+        .first()
+    )
+
+    hardest_collection = (
+        Collection.objects.filter(words__times_shown__gt=0)
+        .annotate(
+            acc=ExpressionWrapper(
+                Sum('words__times_correct') * 100.0 / Sum('words__times_shown'),
+                output_field=FloatField(),
+            )
+        )
+        .order_by('acc')
+        .first()
+    )
+
+    achievements = _get_achievements(total_words, total_quizzes, overall_accuracy)
+
+    context = {
+        'total_words': total_words,
+        'total_quizzes': total_quizzes,
+        'overall_accuracy': overall_accuracy,
+        'quiz_accuracy': quiz_accuracy,
+        'total_shown': total_shown,
+        'recent_quizzes': recent_quizzes,
+        'best_collection': best_collection,
+        'hardest_collection': hardest_collection,
+        'achievements': achievements,
+    }
+    return render(request, 'trainer/profile.html', context)
+
+
+def _get_achievements(total_words, total_quizzes, accuracy):
+    """Return list of earned achievement badges."""
+    earned = []
+    if total_words >= 1:
+        earned.append(('🌱', 'Первое слово', 'Добавил первое слово'))
+    if total_words >= 10:
+        earned.append(('📚', '10 слов', 'Словарь растёт!'))
+    if total_words >= 50:
+        earned.append(('🏆', '50 слов', 'Серьёзный словарный запас'))
+    if total_quizzes >= 1:
+        earned.append(('⚡', 'Первый тест', 'Прошёл первый тест'))
+    if total_quizzes >= 10:
+        earned.append(('🔥', '10 тестов', 'Постоянный практик'))
+    if accuracy >= 80:
+        earned.append(('🎯', 'Меткий', 'Точность выше 80%'))
+    if accuracy == 100 and total_quizzes > 0:
+        earned.append(('💎', 'Перфекционист', 'Идеальная точность'))
+    return earned
+
+
+# ── External API proxies ──────────────────────────────────────────────────────
+
+def api_suggest_translation(request):
+    """Proxy to MyMemory API: suggest Russian translation for a word."""
+    word = request.GET.get('word', '').strip()
+    lang_pair = request.GET.get('langpair', 'en|ru')
+
+    if not word:
+        return JsonResponse({'error': 'Слово не указано'}, status=400)
+
+    url = (
+        'https://api.mymemory.translated.net/get?'
+        + urllib.parse.urlencode({'q': word, 'langpair': lang_pair})
+    )
+    try:
+        with urllib.request.urlopen(url, timeout=API_TIMEOUT) as response:
+            data = json.loads(response.read().decode())
+        translated = data.get('responseData', {}).get('translatedText', '')
+        if not translated or translated.upper() == word.upper():
+            return JsonResponse({'translation': ''})
+        return JsonResponse({'translation': translated.lower()})
+    except (urllib.error.URLError, json.JSONDecodeError, KeyError):
+        return JsonResponse({'error': 'Сервис перевода недоступен'}, status=503)
+
+
+def api_suggest_example(request):
+    """Proxy to Free Dictionary API: fetch an example sentence for an English word."""
+    word = request.GET.get('word', '').strip().lower()
+
+    if not word:
+        return JsonResponse({'error': 'Слово не указано'}, status=400)
+
+    url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{urllib.parse.quote(word)}'
+    try:
+        with urllib.request.urlopen(url, timeout=API_TIMEOUT) as response:
+            data = json.loads(response.read().decode())
+
+        example = ''
+        for entry in data:
+            for meaning in entry.get('meanings', []):
+                for definition in meaning.get('definitions', []):
+                    if definition.get('example'):
+                        example = definition['example']
+                        break
+                if example:
+                    break
+            if example:
+                break
+
+        return JsonResponse({'example': example})
+    except urllib.error.HTTPError:
+        return JsonResponse({'example': ''})
+    except (urllib.error.URLError, json.JSONDecodeError, KeyError):
+        return JsonResponse({'error': 'Dictionary API недоступен'}, status=503)
+
+
 # ── Language views ────────────────────────────────────────────────────────────
 
 def language_list(request):
@@ -61,7 +213,7 @@ def language_list(request):
         form = LanguageForm(request.POST)
         if form.is_valid():
             lang = form.save()
-            messages.success(request, f"✅ Language «{lang.name}» added.")
+            messages.success(request, f"✅ Язык «{lang.name}» добавлен.")
             return redirect('language_list')
     else:
         form = LanguageForm()
@@ -78,7 +230,7 @@ def language_delete(request, pk):
     if request.method == 'POST':
         name = language.name
         language.delete()
-        messages.warning(request, f"🗑️ Language «{name}» deleted.")
+        messages.warning(request, f"🗑️ Язык «{name}» удалён.")
         return redirect('language_list')
 
     return render(request, 'trainer/language_confirm_delete.html', {'language': language})
@@ -116,7 +268,7 @@ def collection_create(request):
     if not Language.objects.exists():
         messages.warning(
             request,
-            "⚠️ Please add at least one language before creating a collection."
+            "⚠️ Сначала добавьте хотя бы один язык."
         )
         return redirect('language_list')
 
@@ -124,15 +276,15 @@ def collection_create(request):
         form = CollectionForm(request.POST)
         if form.is_valid():
             collection = form.save()
-            messages.success(request, f"✅ Collection «{collection.name}» created.")
+            messages.success(request, f"✅ Подборка «{collection.name}» создана.")
             return redirect('collection_detail', pk=collection.pk)
     else:
         form = CollectionForm()
 
     context = {
         'form': form,
-        'title': 'New Collection',
-        'submit_label': 'Create Collection',
+        'title': 'Новая подборка',
+        'submit_label': 'Создать',
     }
     return render(request, 'trainer/collection_form.html', context)
 
@@ -145,7 +297,7 @@ def collection_edit(request, pk):
         form = CollectionForm(request.POST, instance=collection)
         if form.is_valid():
             form.save()
-            messages.success(request, f"✏️ Collection «{collection.name}» updated.")
+            messages.success(request, f"✏️ Подборка «{collection.name}» обновлена.")
             return redirect('collection_detail', pk=pk)
     else:
         form = CollectionForm(instance=collection)
@@ -153,8 +305,8 @@ def collection_edit(request, pk):
     context = {
         'form': form,
         'collection': collection,
-        'title': f'Edit: {collection.name}',
-        'submit_label': 'Save Changes',
+        'title': f'Редактировать: {collection.name}',
+        'submit_label': 'Сохранить',
     }
     return render(request, 'trainer/collection_form.html', context)
 
@@ -166,7 +318,7 @@ def collection_delete(request, pk):
     if request.method == 'POST':
         name = collection.name
         collection.delete()
-        messages.warning(request, f"🗑️ Collection «{name}» deleted.")
+        messages.warning(request, f"🗑️ Подборка «{name}» удалена.")
         return redirect('collection_list')
 
     return render(request, 'trainer/collection_confirm_delete.html', {'collection': collection})
@@ -191,11 +343,11 @@ def word_list(request):
         queryset = queryset.filter(collection__pk=collection_filter)
 
     sort_options = {
-        '-created_at': 'Newest first',
-        'created_at': 'Oldest first',
-        'original': 'A–Z (original)',
-        'translation': 'А–Я (translation)',
-        '-times_shown': 'Most practiced',
+        '-created_at': 'Сначала новые',
+        'created_at': 'Сначала старые',
+        'original': 'А–Я (оригинал)',
+        'translation': 'А–Я (перевод)',
+        '-times_shown': 'Больше тренировок',
     }
     if sort in sort_options:
         queryset = queryset.order_by(sort)
@@ -225,7 +377,7 @@ def word_create(request):
         form = WordForm(request.POST)
         if form.is_valid():
             word = form.save()
-            messages.success(request, f"✅ Word «{word.original}» added.")
+            messages.success(request, f"✅ Слово «{word.original}» добавлено.")
             if word.collection:
                 return redirect('collection_detail', pk=word.collection.pk)
             return redirect('word_list')
@@ -238,8 +390,8 @@ def word_create(request):
 
     context = {
         'form': form,
-        'title': 'Add New Word',
-        'submit_label': 'Add Word',
+        'title': 'Новое слово',
+        'submit_label': 'Добавить',
     }
     return render(request, 'trainer/word_form.html', context)
 
@@ -252,7 +404,7 @@ def word_edit(request, pk):
         form = WordForm(request.POST, instance=word)
         if form.is_valid():
             form.save()
-            messages.success(request, f"✏️ Word «{word.original}» updated.")
+            messages.success(request, f"✏️ Слово «{word.original}» обновлено.")
             return redirect('word_detail', pk=pk)
     else:
         form = WordForm(instance=word)
@@ -260,8 +412,8 @@ def word_edit(request, pk):
     context = {
         'form': form,
         'word': word,
-        'title': f'Edit: {word.original}',
-        'submit_label': 'Save Changes',
+        'title': f'Редактировать: {word.original}',
+        'submit_label': 'Сохранить',
     }
     return render(request, 'trainer/word_form.html', context)
 
@@ -274,7 +426,7 @@ def word_delete(request, pk):
         original = word.original
         collection = word.collection
         word.delete()
-        messages.warning(request, f"🗑️ Word «{original}» deleted.")
+        messages.warning(request, f"🗑️ Слово «{original}» удалено.")
         if collection:
             return redirect('collection_detail', pk=collection.pk)
         return redirect('word_list')
@@ -303,7 +455,7 @@ def quiz_start(request):
                 word_ids = word_ids[:count]
 
             if not word_ids:
-                messages.warning(request, "⚠️ No words found for the selected settings.")
+                messages.warning(request, "⚠️ Нет слов для выбранных настроек.")
                 return redirect('quiz_start')
 
             request.session['quiz_words'] = word_ids
@@ -385,7 +537,7 @@ def quiz_question(request):
 
 
 def quiz_results(request):
-    """Show quiz results and clear the quiz session."""
+    """Show quiz results, save to DB and clear the quiz session."""
     results = request.session.get('quiz_results', [])
 
     if not results:
@@ -394,15 +546,28 @@ def quiz_results(request):
     correct_count = sum(1 for entry in results if entry['is_correct'])
     total = len(results)
     score = round(correct_count / total * 100) if total > 0 else 0
+    direction = request.session.get('quiz_direction', 'orig_trans')
+    collection_pk = request.session.get('quiz_collection')
+
+    collection = None
+    if collection_pk:
+        collection = Collection.objects.filter(pk=collection_pk).first()
+
+    QuizResult.objects.create(
+        score=correct_count,
+        total=total,
+        direction=direction,
+        collection=collection,
+    )
 
     if score == 100:
-        grade = ('🏆', 'Perfect!', 'success')
+        grade = ('🏆', 'Отлично!', 'success')
     elif score >= 80:
-        grade = ('🎉', 'Great job!', 'success')
+        grade = ('🎉', 'Хорошо!', 'success')
     elif score >= 60:
-        grade = ('👍', 'Good effort!', 'warning')
+        grade = ('👍', 'Неплохо!', 'warning')
     else:
-        grade = ('📚', 'Keep practising!', 'danger')
+        grade = ('📚', 'Нужно практиковаться!', 'danger')
 
     for key in ['quiz_words', 'quiz_index', 'quiz_results', 'quiz_direction', 'quiz_collection']:
         request.session.pop(key, None)
