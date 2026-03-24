@@ -1,5 +1,5 @@
 {% extends "trainer/base.html" %}
-{% block title %}{{ title }} — Тренажёр языков{% endblock %}
+{% block title %}{{ title }} — Тренажёр{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -18,31 +18,79 @@
         </nav>
 
         <div class="card">
-            <div class="card-header bg-primary text-white">
-                <i class="bi bi-{% if word %}pencil{% else %}plus-circle{% endif %} me-2"></i>
-                {{ title }}
-            </div>
+            <div class="card-header">{{ title }}</div>
             <div class="card-body p-4">
-                <form method="post" novalidate>
+                <form method="post" novalidate id="word-form">
                     {% csrf_token %}
-                    {% for field in form %}
+
+                    <!-- Оригинал -->
                     <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label fw-semibold">
-                            {{ field.label }}
-                            {% if field.field.required %}
-                                <span class="text-danger">*</span>
-                            {% endif %}
+                        <label class="form-label">
+                            {{ form.original.label }}
+                            <span class="text-danger">*</span>
                         </label>
-                        {{ field }}
-                        {% if field.errors %}
-                            {% for error in field.errors %}
-                                <div class="text-danger small mt-1">
-                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                        {{ form.original }}
+                        {% if form.original.errors %}
+                            {% for error in form.original.errors %}
+                                <div class="text-danger mt-1" style="font-size:.82rem;">
+                                    {{ error }}
                                 </div>
                             {% endfor %}
                         {% endif %}
                     </div>
-                    {% endfor %}
+
+                    <!-- Перевод с подсказкой -->
+                    <div class="mb-3">
+                        <label class="form-label">
+                            {{ form.translation.label }}
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            {{ form.translation }}
+                            <button type="button" class="btn btn-outline-secondary btn-sm"
+                                    id="btn-translate" title="Предложить перевод (MyMemory)">
+                                🔄
+                            </button>
+                        </div>
+                        <div id="translate-hint" class="mt-1" style="font-size:.78rem;"></div>
+                        {% if form.translation.errors %}
+                            {% for error in form.translation.errors %}
+                                <div class="text-danger mt-1" style="font-size:.82rem;">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Пример с подсказкой -->
+                    <div class="mb-3">
+                        <label class="form-label">
+                            {{ form.example.label }}
+                        </label>
+                        <div class="mb-1">
+                            <button type="button" class="btn btn-outline-secondary btn-sm"
+                                    id="btn-example"
+                                    title="Найти пример предложения (Dictionary API)">
+                                📖 Найти пример
+                            </button>
+                            <span id="example-hint" class="text-muted ms-2"
+                                  style="font-size:.78rem;"></span>
+                        </div>
+                        {{ form.example }}
+                        {% if form.example.errors %}
+                            {% for error in form.example.errors %}
+                                <div class="text-danger mt-1" style="font-size:.82rem;">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Подборка -->
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.collection.label }}</label>
+                        {{ form.collection }}
+                    </div>
 
                     {% if form.non_field_errors %}
                         <div class="alert alert-danger">
@@ -54,9 +102,10 @@
 
                     <div class="d-flex gap-2 mt-4">
                         <button type="submit" class="btn btn-primary flex-grow-1">
-                            <i class="bi bi-check-lg me-1"></i>{{ submit_label }}
+                            {{ submit_label }}
                         </button>
-                        <a href="{% if word %}{% url 'word_detail' word.pk %}{% else %}{% url 'word_list' %}{% endif %}"
+                        <a href="{% if word %}{% url 'word_detail' word.pk %}
+                                 {% else %}{% url 'word_list' %}{% endif %}"
                            class="btn btn-outline-secondary">
                             Отмена
                         </a>
@@ -65,6 +114,84 @@
             </div>
         </div>
 
+        <div class="mt-2 p-2 text-center"
+             style="font-size:.75rem;color:var(--clr-muted);">
+            Перевод: <a href="https://mymemory.translated.net" target="_blank"
+                        class="text-muted">MyMemory API</a> &nbsp;·&nbsp;
+            Примеры: <a href="https://dictionaryapi.dev" target="_blank"
+                        class="text-muted">Free Dictionary API</a>
+        </div>
+
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const originalField   = document.getElementById('id_original');
+const translationField = document.getElementById('id_translation');
+const exampleField    = document.getElementById('id_example');
+const btnTranslate    = document.getElementById('btn-translate');
+const btnExample      = document.getElementById('btn-example');
+const translateHint   = document.getElementById('translate-hint');
+const exampleHint     = document.getElementById('example-hint');
+
+function setHint(el, msg, color) {
+    el.textContent = msg;
+    el.style.color = color || 'var(--clr-muted)';
+}
+
+// ── Перевод через MyMemory ────────────────────────────────────────────────────
+btnTranslate.addEventListener('click', async () => {
+    const word = originalField.value.trim();
+    if (!word) {
+        setHint(translateHint, 'Сначала введите слово.', '#e76f51');
+        return;
+    }
+    btnTranslate.disabled = true;
+    setHint(translateHint, 'Ищу перевод…');
+
+    try {
+        const resp = await fetch(`/api/translate/?word=${encodeURIComponent(word)}&langpair=en|ru`);
+        const data = await resp.json();
+        if (data.translation) {
+            translationField.value = data.translation;
+            setHint(translateHint, '✅ Перевод подставлен. Можете изменить.', 'var(--clr-primary)');
+        } else {
+            setHint(translateHint, 'Перевод не найден.', '#e76f51');
+        }
+    } catch {
+        setHint(translateHint, 'Ошибка запроса.', '#e76f51');
+    } finally {
+        btnTranslate.disabled = false;
+    }
+});
+
+// ── Пример через Dictionary API ───────────────────────────────────────────────
+btnExample.addEventListener('click', async () => {
+    const word = originalField.value.trim();
+    if (!word) {
+        exampleHint.textContent = 'Сначала введите слово.';
+        return;
+    }
+    btnExample.disabled = true;
+    exampleHint.textContent = 'Ищу пример…';
+
+    try {
+        const resp = await fetch(`/api/example/?word=${encodeURIComponent(word)}`);
+        const data = await resp.json();
+        if (data.example) {
+            exampleField.value = data.example;
+            exampleHint.textContent = '✅ Пример найден';
+            exampleHint.style.color = 'var(--clr-primary)';
+        } else {
+            exampleHint.textContent = 'Пример не найден (только английские слова).';
+        }
+    } catch {
+        exampleHint.textContent = 'Ошибка запроса.';
+    } finally {
+        btnExample.disabled = false;
+    }
+});
+</script>
 {% endblock %}
