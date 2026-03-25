@@ -1,0 +1,341 @@
+/* ── Шрифты ─────────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+/* ── Переменные ─────────────────────────────────────────────────────────── */
+:root {
+    --clr-primary:   #2d6a4f;
+    --clr-primary-d: #1b4332;
+    --clr-primary-l: #d8f3dc;
+    --clr-accent:    #f4a261;
+    --clr-accent-d:  #e76f51;
+    --clr-bg:        #f8f9f5;
+    --clr-surface:   #ffffff;
+    --clr-border:    #e0e5dc;
+    --clr-text:      #2c3e2d;
+    --clr-muted:     #6b7c6d;
+    --radius:        10px;
+    --shadow:        0 2px 10px rgba(45, 106, 79, .10);
+    --shadow-md:     0 4px 18px rgba(45, 106, 79, .14);
+}
+
+/* ── База ───────────────────────────────────────────────────────────────── */
+body {
+    font-family: 'Nunito', system-ui, sans-serif;
+    background: var(--clr-bg);
+    color: var(--clr-text);
+    font-size: 15px;
+}
+
+a { color: var(--clr-primary); }
+a:hover { color: var(--clr-primary-d); }
+
+/* ── Навбар ─────────────────────────────────────────────────────────────── */
+.site-nav {
+    background: var(--clr-primary-d);
+    padding: .6rem 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,.18);
+}
+
+.site-nav .navbar-brand {
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: #fff;
+    letter-spacing: -.3px;
+}
+
+.site-nav .nav-link {
+    color: rgba(255,255,255,.82) !important;
+    font-weight: 600;
+    font-size: .9rem;
+    padding: .35rem .7rem !important;
+    border-radius: 6px;
+    transition: background .15s;
+}
+
+.site-nav .nav-link:hover,
+.site-nav .nav-link.active {
+    background: rgba(255,255,255,.12);
+    color: #fff !important;
+}
+
+.site-nav .dropdown-menu {
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: .4rem;
+}
+
+.site-nav .dropdown-item {
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: .88rem;
+    color: var(--clr-text);
+}
+
+.site-nav .dropdown-item:hover {
+    background: var(--clr-primary-l);
+    color: var(--clr-primary-d);
+}
+
+.btn-quiz-nav {
+    background: var(--clr-accent);
+    color: #fff !important;
+    font-weight: 700;
+    border-radius: 6px;
+    padding: .35rem 1rem !important;
+    border: none;
+}
+
+.btn-quiz-nav:hover {
+    background: var(--clr-accent-d);
+    color: #fff !important;
+}
+
+/* ── Карточки ───────────────────────────────────────────────────────────── */
+.card {
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    background: var(--clr-surface);
+}
+
+.card-header {
+    background: var(--clr-surface);
+    border-bottom: 1px solid var(--clr-border);
+    font-weight: 700;
+    font-size: .9rem;
+    padding: .8rem 1.1rem;
+    border-radius: var(--radius) var(--radius) 0 0 !important;
+    color: var(--clr-muted);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.card-footer {
+    background: var(--clr-bg);
+    border-top: 1px solid var(--clr-border);
+}
+
+/* ── Кнопки ─────────────────────────────────────────────────────────────── */
+.btn {
+    font-weight: 700;
+    border-radius: 7px;
+    font-size: .875rem;
+    padding: .42rem .9rem;
+}
+
+.btn-primary {
+    background: var(--clr-primary);
+    border-color: var(--clr-primary);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background: var(--clr-primary-d);
+    border-color: var(--clr-primary-d);
+}
+
+.btn-outline-primary {
+    color: var(--clr-primary);
+    border-color: var(--clr-primary);
+}
+
+.btn-outline-primary:hover {
+    background: var(--clr-primary);
+    border-color: var(--clr-primary);
+}
+
+.btn-warning {
+    background: var(--clr-accent);
+    border-color: var(--clr-accent);
+    color: #fff;
+}
+
+.btn-warning:hover {
+    background: var(--clr-accent-d);
+    border-color: var(--clr-accent-d);
+    color: #fff;
+}
+
+/* ── Герой ──────────────────────────────────────────────────────────────── */
+.hero-card {
+    background: linear-gradient(135deg, var(--clr-primary-d) 0%, var(--clr-primary) 100%);
+    border: none;
+    border-radius: 14px;
+    color: #fff;
+}
+
+/* ── Статблоки ──────────────────────────────────────────────────────────── */
+.stat-block {
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.2rem;
+    box-shadow: var(--shadow);
+    transition: transform .15s, box-shadow .15s;
+}
+
+.stat-block:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-block .stat-label {
+    font-size: .78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: var(--clr-muted);
+    margin-bottom: .25rem;
+}
+
+.stat-block .stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--clr-primary);
+}
+
+/* ── Таблицы ─────────────────────────────────────────────────────────────── */
+.table th {
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--clr-muted);
+    font-weight: 700;
+    border-bottom-width: 1px;
+}
+
+.table td { vertical-align: middle; }
+.table-hover tbody tr:hover { background: var(--clr-primary-l); }
+
+/* ── Бейджи ─────────────────────────────────────────────────────────────── */
+.badge {
+    font-weight: 700;
+    font-size: .72rem;
+    letter-spacing: .3px;
+    padding: .3em .65em;
+}
+
+.badge.bg-primary {
+    background: var(--clr-primary) !important;
+}
+
+/* ── Формы ──────────────────────────────────────────────────────────────── */
+.form-control, .form-select {
+    border-color: var(--clr-border);
+    border-radius: 7px;
+    font-size: .9rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--clr-primary);
+    box-shadow: 0 0 0 3px rgba(45,106,79,.15);
+}
+
+.form-label {
+    font-weight: 700;
+    font-size: .85rem;
+    color: var(--clr-text);
+    margin-bottom: .3rem;
+}
+
+/* ── Прогресс ───────────────────────────────────────────────────────────── */
+.progress {
+    background: var(--clr-border);
+    border-radius: 99px;
+}
+
+.progress-bar {
+    border-radius: 99px;
+}
+
+/* ── Алерты ─────────────────────────────────────────────────────────────── */
+.alert {
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: .9rem;
+    border-left-width: 4px;
+}
+
+.alert-success {
+    background: #f0faf4;
+    border-color: #52b788;
+    color: #1b4332;
+}
+
+.alert-warning {
+    background: #fff8f0;
+    border-color: var(--clr-accent);
+    color: #7c3d12;
+}
+
+.alert-danger {
+    background: #fff5f5;
+    border-color: #e63946;
+    color: #7b1d1d;
+}
+
+/* ── Навигационные цепочки ───────────────────────────────────────────────── */
+.breadcrumb {
+    font-size: .82rem;
+    font-weight: 600;
+}
+
+.breadcrumb-item a { color: var(--clr-primary); text-decoration: none; }
+.breadcrumb-item.active { color: var(--clr-muted); }
+
+/* ── Карточка квиза ─────────────────────────────────────────────────────── */
+.quiz-question-card {
+    border-top: 4px solid var(--clr-primary);
+}
+
+.question-word {
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: var(--clr-primary-d);
+    letter-spacing: -.5px;
+}
+
+/* ── Подвал ─────────────────────────────────────────────────────────────── */
+.site-footer {
+    border-top: 1px solid var(--clr-border);
+    font-size: .82rem;
+    color: var(--clr-muted);
+    padding: 1rem 0;
+    margin-top: 2rem;
+}
+
+/* ── Пустые состояния ───────────────────────────────────────────────────── */
+.empty-state {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--clr-muted);
+}
+
+.empty-state i {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: .75rem;
+    opacity: .5;
+}
+
+/* ── Карточки подборок ──────────────────────────────────────────────────── */
+.collection-card {
+    transition: transform .15s, box-shadow .15s;
+}
+
+.collection-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.lang-pill {
+    display: inline-block;
+    background: var(--clr-primary-l);
+    color: var(--clr-primary-d);
+    font-size: .72rem;
+    font-weight: 700;
+    padding: .2em .65em;
+    border-radius: 99px;
+    letter-spacing: .3px;
+}
