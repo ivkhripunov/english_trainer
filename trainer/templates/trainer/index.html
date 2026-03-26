@@ -2,53 +2,53 @@
 {% block title %}Тренажёр языков — Главная{% endblock %}
 
 {% block content %}
-<!-- Герой -->
-<div class="card bg-primary text-white p-4 mb-4">
+
+<div class="hero-card p-4 mb-4">
     <div class="row align-items-center">
-        <div class="col-md-8">
-            <h1 class="fw-bold mb-1">
-                <i class="bi bi-translate me-2"></i>Тренажёр языков
+        <div class="col-md-9">
+            <h1 class="fw-800 mb-1" style="font-size:1.9rem;">
+                Привет! Готов учить слова? 👋
             </h1>
-            <p class="mb-3 opacity-75">
-                Учи слова на любом языке. Создавай подборки и тренируйся с тестами.
+            <p class="mb-3" style="opacity:.8; font-size:.95rem;">
+                Создай подборку, добавь слова и тренируйся. Тренажёр запомнит, что тебе даётся хуже всего.
             </p>
-            <a href="{% url 'quiz_start' %}" class="btn btn-warning btn-lg fw-bold me-2">
-                <i class="bi bi-lightning-fill me-1"></i>Начать тест
-            </a>
-            <a href="{% url 'collection_create' %}" class="btn btn-outline-light btn-lg">
-                <i class="bi bi-plus-lg me-1"></i>Новая подборка
-            </a>
-        </div>
-        <div class="col-md-4 text-center d-none d-md-block">
-            <i class="bi bi-translate" style="font-size: 6rem; opacity: .25;"></i>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'quiz_start' %}" class="btn btn-warning">
+                    ⚡ Начать тест
+                </a>
+                <a href="{% url 'collection_create' %}"
+                   class="btn btn-outline-light btn-sm" style="font-weight:600;">
+                    + Новая подборка
+                </a>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- Статистика -->
 <div class="row g-3 mb-4">
-    <div class="col-sm-3">
-        <div class="card stat-card border-primary h-100 p-3">
-            <div class="text-muted small mb-1">Языков</div>
-            <div class="fs-2 fw-bold text-primary">{{ total_languages }}</div>
+    <div class="col-6 col-md-3">
+        <div class="stat-block">
+            <div class="stat-label">Языков</div>
+            <div class="stat-value">{{ total_languages }}</div>
         </div>
     </div>
-    <div class="col-sm-3">
-        <div class="card stat-card border-info h-100 p-3">
-            <div class="text-muted small mb-1">Подборок</div>
-            <div class="fs-2 fw-bold text-info">{{ total_collections }}</div>
+    <div class="col-6 col-md-3">
+        <div class="stat-block">
+            <div class="stat-label">Подборок</div>
+            <div class="stat-value">{{ total_collections }}</div>
         </div>
     </div>
-    <div class="col-sm-3">
-        <div class="card stat-card border-secondary h-100 p-3">
-            <div class="text-muted small mb-1">Всего слов</div>
-            <div class="fs-2 fw-bold text-secondary">{{ total_words }}</div>
+    <div class="col-6 col-md-3">
+        <div class="stat-block">
+            <div class="stat-label">Слов</div>
+            <div class="stat-value">{{ total_words }}</div>
         </div>
     </div>
-    <div class="col-sm-3">
-        <div class="card stat-card border-success h-100 p-3">
-            <div class="text-muted small mb-1">Точность</div>
-            <div class="fs-2 fw-bold text-success">{{ overall_accuracy }}%</div>
+    <div class="col-6 col-md-3">
+        <div class="stat-block">
+            <div class="stat-label">Точность</div>
+            <div class="stat-value">{{ overall_accuracy }}%</div>
         </div>
     </div>
 </div>
@@ -57,82 +57,76 @@
     <!-- Последние подборки -->
     <div class="col-md-7">
         <div class="card h-100">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-journals me-2 text-primary"></i>Последние подборки</span>
-                <a href="{% url 'collection_list' %}" class="btn btn-sm btn-outline-primary">
-                    Все подборки
-                </a>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Последние подборки</span>
+                <a href="{% url 'collection_list' %}"
+                   class="btn btn-outline-primary btn-sm">Все</a>
             </div>
-            <div class="card-body p-0">
-                {% if recent_collections %}
-                <ul class="list-group list-group-flush">
-                    {% for col in recent_collections %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-3">
-                        <div>
-                            <span class="badge bg-primary me-2">{{ col.language }}</span>
-                            <a href="{% url 'collection_detail' col.pk %}"
-                               class="fw-semibold text-decoration-none">
-                                {{ col.name }}
-                            </a>
-                            <span class="text-muted ms-2 small">
-                                {{ col.word_count }} сл.
-                            </span>
-                        </div>
-                        <a href="{% url 'quiz_start' %}?collection={{ col.pk }}"
-                           class="btn btn-sm btn-warning">
-                            <i class="bi bi-lightning-fill"></i>
+            {% if recent_collections %}
+            <ul class="list-group list-group-flush">
+                {% for col in recent_collections %}
+                <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-3">
+                    <div>
+                        <span class="lang-pill me-2">{{ col.language }}</span>
+                        <a href="{% url 'collection_detail' col.pk %}"
+                           class="fw-700 text-decoration-none" style="font-weight:700;">
+                            {{ col.name }}
                         </a>
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <div class="text-center text-muted py-4">
-                    <i class="bi bi-journals fs-2 d-block mb-2"></i>
-                    Подборок пока нет.
-                    <a href="{% url 'collection_create' %}">Создать первую!</a>
-                </div>
-                {% endif %}
+                        <span class="text-muted ms-2" style="font-size:.82rem;">
+                            {{ col.word_count }} сл.
+                        </span>
+                    </div>
+                    <a href="{% url 'quiz_start' %}?collection={{ col.pk }}"
+                       class="btn btn-warning btn-sm">⚡</a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-journals"></i>
+                Подборок пока нет.
+                <a href="{% url 'collection_create' %}">Создать первую!</a>
             </div>
+            {% endif %}
         </div>
     </div>
 
     <!-- Сложные слова -->
     <div class="col-md-5">
         <div class="card h-100">
-            <div class="card-header bg-white">
-                <i class="bi bi-fire me-2 text-danger"></i>Сложные слова
-            </div>
-            <div class="card-body p-0">
-                {% if hardest_words %}
-                <ul class="list-group list-group-flush">
-                    {% for word in hardest_words %}
-                    <li class="list-group-item py-3">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <a href="{% url 'word_detail' word.pk %}"
-                                   class="fw-semibold text-decoration-none">
-                                    {{ word.original }}
-                                </a>
-                                <span class="text-muted ms-2">— {{ word.translation }}</span>
+            <div class="card-header">🔥 Сложные слова</div>
+            {% if hardest_words %}
+            <ul class="list-group list-group-flush">
+                {% for word in hardest_words %}
+                <li class="list-group-item px-3 py-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <a href="{% url 'word_detail' word.pk %}"
+                               class="fw-700 text-decoration-none" style="font-weight:700;">
+                                {{ word.original }}
+                            </a>
+                            <span class="text-muted ms-1">— {{ word.translation }}</span>
+                            {% if word.collection %}
+                            <div style="font-size:.78rem; color:var(--clr-muted); margin-top:2px;">
+                                {{ word.collection.name }}
                             </div>
-                            <span class="badge bg-{{ word.accuracy_color }}">{{ word.accuracy }}%</span>
+                            {% endif %}
                         </div>
-                        {% if word.collection %}
-                            <div class="text-muted small mt-1">
-                                <i class="bi bi-journals me-1"></i>{{ word.collection.name }}
-                            </div>
-                        {% endif %}
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <div class="text-center text-muted py-4">
-                    <i class="bi bi-check-circle fs-2 d-block mb-2 text-success"></i>
-                    Данных пока нет — пройди тест!
-                </div>
-                {% endif %}
+                        <span class="badge bg-{{ word.accuracy_color }} ms-2">
+                            {{ word.accuracy }}%
+                        </span>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-check2-circle"></i>
+                Пройди тест, чтобы увидеть статистику.
             </div>
+            {% endif %}
         </div>
     </div>
 </div>
+
 {% endblock %}
