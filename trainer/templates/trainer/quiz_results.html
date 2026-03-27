@@ -1,59 +1,57 @@
 {% extends "trainer/base.html" %}
-{% block title %}Результаты теста — Тренажёр языков{% endblock %}
+{% block title %}Результаты — Тренажёр{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-7">
+    <div class="col-md-7">
 
-        <!-- Итог -->
-        <div class="card text-center mb-4">
+        <div class="card mb-3 text-center">
             <div class="card-body p-4">
-                <div style="font-size: 4rem;">{{ grade_icon }}</div>
-                <h2 class="fw-bold mt-2 mb-1">{{ grade_text }}</h2>
-                <div class="display-4 fw-bold text-{{ grade_color }} mb-1">{{ score }}%</div>
-                <p class="text-muted">
-                    Правильных ответов: <strong>{{ correct_count }}</strong> из
-                    <strong>{{ total }}</strong>
+                <div style="font-size:3.5rem; line-height:1;">{{ grade_icon }}</div>
+                <h3 class="mt-2 mb-1" style="font-weight:800;">{{ grade_text }}</h3>
+                <div class="mb-1" style="font-size:3rem; font-weight:800; color:var(--clr-primary);">
+                    {{ score }}%
+                </div>
+                <p class="text-muted mb-3" style="font-size:.9rem;">
+                    {{ correct_count }} из {{ total }} правильно
                 </p>
-                <div class="progress mx-auto mb-4" style="height: 12px; max-width: 300px;">
-                    <div class="progress-bar bg-{{ grade_color }}" style="width: {{ score }}%;"></div>
+                <div class="progress mx-auto mb-4" style="height:10px; max-width:260px;">
+                    <div class="progress-bar bg-{{ grade_color }}"
+                         style="width:{{ score }}%;"></div>
                 </div>
                 <div class="d-flex gap-2 justify-content-center flex-wrap">
-                    <a href="{% url 'quiz_start' %}" class="btn btn-warning btn-lg">
-                        <i class="bi bi-arrow-repeat me-1"></i>Пройти ещё раз
+                    <a href="{% url 'quiz_start' %}" class="btn btn-warning">
+                        ↩ Ещё раз
                     </a>
-                    <a href="{% url 'index' %}" class="btn btn-outline-secondary btn-lg">
-                        <i class="bi bi-house me-1"></i>Главная
+                    <a href="{% url 'index' %}" class="btn btn-outline-secondary">
+                        На главную
                     </a>
                 </div>
             </div>
         </div>
 
-        <!-- Детали -->
         <div class="card">
-            <div class="card-header bg-white fw-semibold">
-                <i class="bi bi-card-checklist me-2 text-primary"></i>Подробные результаты
-            </div>
+            <div class="card-header">Разбор ошибок</div>
             <div class="table-responsive">
-                <table class="table table-hover mb-0 align-middle">
-                    <thead class="table-light">
+                <table class="table mb-0" style="font-size:.88rem;">
+                    <thead>
                         <tr>
                             <th>#</th>
                             <th>Слово</th>
-                            <th>Правильный ответ</th>
+                            <th>Правильно</th>
                             <th>Ваш ответ</th>
-                            <th class="text-center">Итог</th>
+                            <th class="text-center">—</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for result in results %}
-                        <tr class="{% if result.is_correct %}table-success{% else %}table-danger{% endif %} bg-opacity-25">
-                            <td class="text-muted small">{{ forloop.counter }}</td>
-                            <td class="fw-semibold">{{ result.original }}</td>
+                        <tr>
+                            <td class="text-muted">{{ forloop.counter }}</td>
+                            <td class="fw-700" style="font-weight:700;">{{ result.original }}</td>
                             <td>{{ result.correct_answer }}</td>
                             <td>
                                 {% if result.is_correct %}
-                                    {{ result.user_answer }}
+                                    <span class="text-success">{{ result.user_answer }}</span>
                                 {% else %}
                                     <span class="text-danger text-decoration-line-through">
                                         {{ result.user_answer }}
@@ -62,9 +60,9 @@
                             </td>
                             <td class="text-center">
                                 {% if result.is_correct %}
-                                    <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                    <i class="bi bi-check-circle-fill text-success"></i>
                                 {% else %}
-                                    <i class="bi bi-x-circle-fill text-danger fs-5"></i>
+                                    <i class="bi bi-x-circle-fill text-danger"></i>
                                 {% endif %}
                             </td>
                         </tr>

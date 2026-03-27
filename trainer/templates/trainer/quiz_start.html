@@ -1,56 +1,51 @@
 {% extends "trainer/base.html" %}
-{% block title %}Начать тест — Тренажёр языков{% endblock %}
+{% block title %}Тест — Тренажёр{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
+    <div class="col-md-5">
+
         <div class="text-center mb-4">
-            <i class="bi bi-lightning-fill text-warning" style="font-size: 3rem;"></i>
-            <h2 class="fw-bold mt-2">Начать тест</h2>
-            <p class="text-muted">Выберите подборку и проверьте себя</p>
+            <div style="font-size:3rem;">⚡</div>
+            <h2 style="font-weight:800;">Тест</h2>
+            <p class="text-muted" style="font-size:.9rem;">
+                Настройте и нажмите «Начать»
+            </p>
         </div>
 
         {% if can_start %}
         <div class="card">
-            <div class="card-header bg-white fw-semibold">
-                <i class="bi bi-sliders me-2 text-primary"></i>Настройки теста
-            </div>
+            <div class="card-header">Настройки</div>
             <div class="card-body p-4">
                 <form method="post">
                     {% csrf_token %}
                     {% for field in form %}
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold">{{ field.label }}</label>
+                    <div class="mb-3">
+                        <label class="form-label">{{ field.label }}</label>
                         {{ field }}
                         {% if field.errors %}
                             {% for error in field.errors %}
-                                <div class="text-danger small mt-1">{{ error }}</div>
+                                <div class="text-danger mt-1" style="font-size:.82rem;">{{ error }}</div>
                             {% endfor %}
                         {% endif %}
                     </div>
                     {% endfor %}
-                    <div class="d-grid mt-2">
-                        <button type="submit" class="btn btn-warning btn-lg fw-bold">
-                            <i class="bi bi-play-fill me-1"></i>Начать!
-                        </button>
-                    </div>
+                    <button type="submit" class="btn btn-warning w-100 mt-1" style="font-size:1rem;">
+                        Начать →
+                    </button>
                 </form>
             </div>
-            <div class="card-footer text-muted small text-center">
-                Всего доступно слов: {{ word_count }}
+            <div class="card-footer text-center" style="font-size:.8rem;">
+                Доступно слов: {{ word_count }}
             </div>
         </div>
         {% else %}
-        <div class="card text-center py-5">
-            <i class="bi bi-journal-x text-muted fs-1 mb-3"></i>
-            <h5 class="text-muted">Слов пока нет</h5>
-            <p class="text-muted small">Сначала добавьте слова в подборку.</p>
-            <div class="d-flex gap-2 justify-content-center mt-2">
-                <a href="{% url 'language_list' %}" class="btn btn-outline-primary btn-sm">
-                    Добавить язык
-                </a>
+        <div class="card">
+            <div class="empty-state">
+                <i class="bi bi-journal-x"></i>
+                <p class="mb-2">Слов пока нет</p>
                 <a href="{% url 'collection_create' %}" class="btn btn-primary btn-sm">
-                    Новая подборка
+                    Создать подборку
                 </a>
             </div>
         </div>
