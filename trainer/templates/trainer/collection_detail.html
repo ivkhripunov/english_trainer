@@ -1,0 +1,121 @@
+{% extends "trainer/base.html" %}
+{% block title %}{{ collection.name }} — Language Trainer{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'collection_list' %}">Collections</a></li>
+        <li class="breadcrumb-item active">{{ collection.name }}</li>
+    </ol>
+</nav>
+
+<!-- Header -->
+<div class="card mb-4">
+    <div class="card-body p-4">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <span class="badge bg-primary mb-2">{{ collection.language }}</span>
+                <h2 class="fw-bold mb-1">{{ collection.name }}</h2>
+                {% if collection.description %}
+                    <p class="text-muted mb-2">{{ collection.description }}</p>
+                {% endif %}
+                <div class="d-flex gap-3 text-muted small">
+                    <span><i class="bi bi-card-text me-1"></i>{{ collection.word_count }} words</span>
+                    {% if collection.total_shown > 0 %}
+                        <span>
+                            <i class="bi bi-bullseye me-1"></i>Accuracy:
+                            <span class="text-{{ collection.accuracy_color }} fw-semibold">
+                                {{ collection.accuracy }}%
+                            </span>
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-4 d-flex gap-2 justify-content-md-end mt-3 mt-md-0 flex-wrap">
+                <a href="{% url 'word_create' %}?collection={{ collection.pk }}"
+                   class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i>Add Word
+                </a>
+                <a href="{% url 'quiz_start' %}?collection={{ collection.pk }}"
+                   class="btn btn-warning">
+                    <i class="bi bi-lightning-fill me-1"></i>Quiz
+                </a>
+                <a href="{% url 'collection_edit' collection.pk %}"
+                   class="btn btn-outline-secondary">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'collection_delete' collection.pk %}"
+                   class="btn btn-outline-danger">
+                    <i class="bi bi-trash"></i>
+                </a>
+            </div>
+        </div>
+        {% if collection.total_shown > 0 %}
+        <div class="progress mt-3" style="height: 8px;">
+            <div class="progress-bar bg-{{ collection.accuracy_color }}"
+                 style="width: {{ collection.accuracy }}%;"></div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Words table -->
+{% if words %}
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Original</th>
+                    <th>Translation</th>
+                    <th class="d-none d-md-table-cell">Example</th>
+                    <th class="text-center">Accuracy</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for word in words %}
+                <tr>
+                    <td class="fw-semibold">
+                        <a href="{% url 'word_detail' word.pk %}" class="text-decoration-none">
+                            {{ word.original }}
+                        </a>
+                    </td>
+                    <td class="text-muted">{{ word.translation }}</td>
+                    <td class="d-none d-md-table-cell text-muted small">
+                        {{ word.example|truncatechars:50|default:"—" }}
+                    </td>
+                    <td class="text-center">
+                        {% if word.times_shown > 0 %}
+                            <span class="badge bg-{{ word.accuracy_color }}">{{ word.accuracy }}%</span>
+                        {% else %}
+                            <span class="badge bg-secondary">New</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <a href="{% url 'word_edit' word.pk %}"
+                           class="btn btn-sm btn-outline-secondary me-1">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'word_delete' word.pk %}"
+                           class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card text-center py-5">
+    <i class="bi bi-inbox text-muted fs-1 mb-3"></i>
+    <h5 class="text-muted">No words in this collection yet</h5>
+    <a href="{% url 'word_create' %}?collection={{ collection.pk }}"
+       class="btn btn-primary mt-2 mx-auto" style="width:fit-content;">
+        <i class="bi bi-plus-lg me-1"></i>Add first word
+    </a>
+</div>
+{% endif %}
+{% endblock %}

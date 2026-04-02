@@ -1,0 +1,95 @@
+{% extends "trainer/base.html" %}
+{% block title %}Collections — Language Trainer{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="fw-bold mb-0">
+        <i class="bi bi-journals me-2 text-primary"></i>Collections
+    </h2>
+    <a href="{% url 'collection_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>New Collection
+    </a>
+</div>
+
+<!-- Language filter -->
+{% if languages %}
+<div class="mb-4">
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'collection_list' %}"
+           class="btn btn-sm {% if not language_filter %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+            All languages
+        </a>
+        {% for lang in languages %}
+        <a href="?language={{ lang.pk }}"
+           class="btn btn-sm {% if language_filter == lang.pk|stringformat:'s' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+            {{ lang.name }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if collections %}
+<div class="row g-3">
+    {% for col in collections %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="badge bg-primary">{{ col.language }}</span>
+                    {% if col.total_shown > 0 %}
+                        <span class="badge bg-{{ col.accuracy_color }}">{{ col.accuracy }}%</span>
+                    {% else %}
+                        <span class="badge bg-secondary">New</span>
+                    {% endif %}
+                </div>
+                <h5 class="fw-bold mb-1">
+                    <a href="{% url 'collection_detail' col.pk %}" class="text-decoration-none">
+                        {{ col.name }}
+                    </a>
+                </h5>
+                {% if col.description %}
+                    <p class="text-muted small mb-2">{{ col.description|truncatechars:80 }}</p>
+                {% endif %}
+                <p class="text-muted small mb-3">
+                    <i class="bi bi-card-text me-1"></i>{{ col.word_count }} word{{ col.word_count|pluralize }}
+                </p>
+                {% if col.total_shown > 0 %}
+                <div class="progress mb-3" style="height: 6px;">
+                    <div class="progress-bar bg-{{ col.accuracy_color }}"
+                         style="width: {{ col.accuracy }}%;"></div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-white d-flex gap-2">
+                <a href="{% url 'collection_detail' col.pk %}"
+                   class="btn btn-sm btn-outline-primary flex-grow-1">
+                    <i class="bi bi-eye me-1"></i>Open
+                </a>
+                <a href="{% url 'quiz_start' %}?collection={{ col.pk }}"
+                   class="btn btn-sm btn-warning">
+                    <i class="bi bi-lightning-fill"></i>
+                </a>
+                <a href="{% url 'collection_edit' col.pk %}"
+                   class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'collection_delete' col.pk %}"
+                   class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-trash"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card text-center py-5">
+    <i class="bi bi-journals text-muted fs-1 mb-3"></i>
+    <h5 class="text-muted">No collections yet</h5>
+    <a href="{% url 'collection_create' %}" class="btn btn-primary mt-2 mx-auto" style="width:fit-content;">
+        <i class="bi bi-plus-lg me-1"></i>Create first collection
+    </a>
+</div>
+{% endif %}
+{% endblock %}
