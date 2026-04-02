@@ -1,0 +1,96 @@
+{% extends "trainer/base.html" %}
+{% block title %}Languages — Language Trainer{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+    <!-- Left: language list -->
+    <div class="col-md-7">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="fw-bold mb-0">
+                <i class="bi bi-globe2 me-2 text-primary"></i>Languages
+            </h2>
+        </div>
+
+        {% if languages %}
+        <div class="card">
+            <ul class="list-group list-group-flush">
+                {% for lang in languages %}
+                <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                    <div>
+                        <span class="fw-semibold fs-5">{{ lang.name }}</span>
+                        {% if lang.native_name %}
+                            <span class="text-muted ms-2">/ {{ lang.native_name }}</span>
+                        {% endif %}
+                        <div class="text-muted small mt-1">
+                            {{ lang.collection_count }} collection{{ lang.collection_count|pluralize }}
+                            &middot; {{ lang.word_count }} word{{ lang.word_count|pluralize }}
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'collection_list' %}?language={{ lang.pk }}"
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-journals me-1"></i>Collections
+                        </a>
+                        <a href="{% url 'language_delete' lang.pk %}"
+                           class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% else %}
+        <div class="card text-center py-5">
+            <i class="bi bi-globe2 text-muted fs-1 mb-3"></i>
+            <h5 class="text-muted">No languages yet</h5>
+            <p class="text-muted small">Add your first language using the form on the right.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Right: add language form -->
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-plus-circle me-2"></i>Add Language
+            </div>
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small mt-1">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-plus-lg me-1"></i>Add Language
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-body text-center p-3">
+                <p class="text-muted small mb-2">Ready to add words?</p>
+                <a href="{% url 'collection_create' %}" class="btn btn-outline-primary btn-sm me-2">
+                    <i class="bi bi-journals me-1"></i>New Collection
+                </a>
+                <a href="{% url 'word_create' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i>Add Word
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

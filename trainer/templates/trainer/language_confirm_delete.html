@@ -1,0 +1,32 @@
+{% extends "trainer/base.html" %}
+{% block title %}Delete Language — Language Trainer{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Deletion
+            </div>
+            <div class="card-body text-center p-4">
+                <i class="bi bi-globe2 text-danger mb-3" style="font-size: 3rem;"></i>
+                <h5>Are you sure you want to delete language</h5>
+                <p class="fs-4 fw-bold text-primary">{{ language.name }}</p>
+                <p class="text-muted small">
+                    This will also delete all collections and words for this language.
+                    This action cannot be undone.
+                </p>
+                <form method="post" class="d-flex gap-2 justify-content-center">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="bi bi-trash me-1"></i>Yes, delete
+                    </button>
+                    <a href="{% url 'language_list' %}" class="btn btn-outline-secondary px-4">
+                        Cancel
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
