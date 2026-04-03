@@ -1,28 +1,40 @@
 {% extends "trainer/base.html" %}
-{% block title %}Word List — English Trainer{% endblock %}
+{% block title %}All Words — Language Trainer{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="fw-bold mb-0">
-        <i class="bi bi-list-ul me-2 text-primary"></i>My Vocabulary
+        <i class="bi bi-list-ul me-2 text-primary"></i>All Words
     </h2>
     <a href="{% url 'word_create' %}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>Add Word
     </a>
 </div>
 
-<!-- Search & Sort -->
+<!-- Filters -->
 <div class="card mb-4">
     <div class="card-body">
         <form method="get" class="row g-2 align-items-end">
-            <div class="col-sm-7">
+            <div class="col-sm-4">
                 <label class="form-label small fw-semibold text-muted">Search</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
                     <input type="text" name="search" class="form-control"
-                           placeholder="Search English or Russian..."
+                           placeholder="Search word or translation..."
                            value="{{ search }}">
                 </div>
+            </div>
+            <div class="col-sm-3">
+                <label class="form-label small fw-semibold text-muted">Collection</label>
+                <select name="collection" class="form-select">
+                    <option value="">All collections</option>
+                    {% for col in collections %}
+                        <option value="{{ col.pk }}"
+                            {% if collection_filter == col.pk|stringformat:'s' %}selected{% endif %}>
+                            {{ col.language }} / {{ col.name }}
+                        </option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="col-sm-3">
                 <label class="form-label small fw-semibold text-muted">Sort by</label>
@@ -41,13 +53,8 @@
     </div>
 </div>
 
-<!-- Results count -->
 <p class="text-muted small mb-3">
-    {% if search %}
-        Found <strong>{{ total_count }}</strong> word{{ total_count|pluralize }} for "{{ search }}"
-    {% else %}
-        <strong>{{ total_count }}</strong> word{{ total_count|pluralize }} in total
-    {% endif %}
+    <strong>{{ total_count }}</strong> word{{ total_count|pluralize }} found
 </p>
 
 {% if words %}
@@ -56,9 +63,9 @@
         <table class="table table-hover mb-0 align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>English</th>
-                    <th>Russian</th>
-                    <th class="d-none d-md-table-cell">Example</th>
+                    <th>Original</th>
+                    <th>Translation</th>
+                    <th class="d-none d-md-table-cell">Collection</th>
                     <th class="text-center">Accuracy</th>
                     <th class="text-end">Actions</th>
                 </tr>
@@ -68,35 +75,35 @@
                 <tr>
                     <td class="fw-semibold">
                         <a href="{% url 'word_detail' word.pk %}" class="text-decoration-none">
-                            {{ word.english }}
+                            {{ word.original }}
                         </a>
                     </td>
-                    <td class="text-muted">{{ word.russian }}</td>
+                    <td class="text-muted">{{ word.translation }}</td>
                     <td class="d-none d-md-table-cell text-muted small">
-                        {% if word.example %}
-                            {{ word.example|truncatechars:50 }}
+                        {% if word.collection %}
+                            <a href="{% url 'collection_detail' word.collection.pk %}"
+                               class="text-decoration-none">
+                                <span class="badge bg-primary me-1">{{ word.collection.language }}</span>
+                                {{ word.collection.name }}
+                            </a>
                         {% else %}
-                            <span class="fst-italic opacity-50">—</span>
+                            <span class="fst-italic opacity-50">No collection</span>
                         {% endif %}
                     </td>
                     <td class="text-center">
                         {% if word.times_shown > 0 %}
-                            <span class="badge bg-{{ word.accuracy_color }}">
-                                {{ word.accuracy }}%
-                            </span>
+                            <span class="badge bg-{{ word.accuracy_color }}">{{ word.accuracy }}%</span>
                         {% else %}
                             <span class="badge bg-secondary">New</span>
                         {% endif %}
                     </td>
                     <td class="text-end">
                         <a href="{% url 'word_edit' word.pk %}"
-                           class="btn btn-sm btn-outline-secondary me-1"
-                           title="Edit">
+                           class="btn btn-sm btn-outline-secondary me-1">
                             <i class="bi bi-pencil"></i>
                         </a>
                         <a href="{% url 'word_delete' word.pk %}"
-                           class="btn btn-sm btn-outline-danger"
-                           title="Delete">
+                           class="btn btn-sm btn-outline-danger">
                             <i class="bi bi-trash"></i>
                         </a>
                     </td>
@@ -109,15 +116,9 @@
 {% else %}
 <div class="card text-center py-5">
     <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
-    {% if search %}
-        <h5 class="text-muted">No words found for "{{ search }}"</h5>
-        <a href="{% url 'word_list' %}" class="btn btn-outline-secondary mt-2">Clear search</a>
-    {% else %}
-        <h5 class="text-muted">Your vocabulary is empty</h5>
-        <a href="{% url 'word_create' %}" class="btn btn-primary mt-2">
-            <i class="bi bi-plus-lg me-1"></i>Add your first word
-        </a>
-    {% endif %}
+    <h5 class="text-muted">No words found</h5>
+    <a href="{% url 'word_list' %}" class="btn btn-outline-secondary mt-2 mx-auto"
+       style="width:fit-content;">Clear filters</a>
 </div>
 {% endif %}
 {% endblock %}
