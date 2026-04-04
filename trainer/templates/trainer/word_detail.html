@@ -1,11 +1,17 @@
 {% extends "trainer/base.html" %}
-{% block title %}{{ word.english }} — English Trainer{% endblock %}
+{% block title %}{{ word.original }} — Тренажёр языков{% endblock %}
 
 {% block content %}
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'word_list' %}">Words</a></li>
-        <li class="breadcrumb-item active">{{ word.english }}</li>
+        {% if word.collection %}
+            <li class="breadcrumb-item">
+                <a href="{% url 'collection_detail' word.collection.pk %}">{{ word.collection.name }}</a>
+            </li>
+        {% else %}
+            <li class="breadcrumb-item"><a href="{% url 'word_list' %}">Слова</a></li>
+        {% endif %}
+        <li class="breadcrumb-item active">{{ word.original }}</li>
     </ol>
 </nav>
 
@@ -14,20 +20,23 @@
         <div class="card">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                 <span class="fw-bold fs-5">
-                    <i class="bi bi-card-text me-2 text-primary"></i>Word Card
+                    <i class="bi bi-card-text me-2 text-primary"></i>Карточка слова
                 </span>
                 <div>
                     <a href="{% url 'word_edit' word.pk %}" class="btn btn-sm btn-outline-primary me-1">
-                        <i class="bi bi-pencil me-1"></i>Edit
+                        <i class="bi bi-pencil me-1"></i>Изменить
                     </a>
                     <a href="{% url 'word_delete' word.pk %}" class="btn btn-sm btn-outline-danger">
-                        <i class="bi bi-trash me-1"></i>Delete
+                        <i class="bi bi-trash me-1"></i>Удалить
                     </a>
                 </div>
             </div>
             <div class="card-body p-4 text-center">
-                <div class="display-5 fw-bold text-primary mb-2">{{ word.english }}</div>
-                <div class="fs-3 text-muted mb-3">{{ word.russian }}</div>
+                {% if word.collection %}
+                    <span class="badge bg-primary mb-3">{{ word.collection.language }} / {{ word.collection.name }}</span>
+                {% endif %}
+                <div class="display-5 fw-bold text-primary mb-2">{{ word.original }}</div>
+                <div class="fs-3 text-muted mb-3">{{ word.translation }}</div>
                 {% if word.example %}
                     <div class="bg-light rounded p-3 fst-italic text-muted">
                         <i class="bi bi-quote me-1"></i>{{ word.example }}
@@ -38,11 +47,11 @@
                 <div class="row text-center">
                     <div class="col-4">
                         <div class="fw-bold fs-5">{{ word.times_shown }}</div>
-                        <div class="text-muted small">Shown</div>
+                        <div class="text-muted small">Показов</div>
                     </div>
                     <div class="col-4">
                         <div class="fw-bold fs-5 text-success">{{ word.times_correct }}</div>
-                        <div class="text-muted small">Correct</div>
+                        <div class="text-muted small">Верных</div>
                     </div>
                     <div class="col-4">
                         <div class="fw-bold fs-5">
@@ -50,7 +59,7 @@
                                 {{ word.accuracy }}%
                             </span>
                         </div>
-                        <div class="text-muted small">Accuracy</div>
+                        <div class="text-muted small">Точность</div>
                     </div>
                 </div>
                 {% if word.times_shown > 0 %}
@@ -63,11 +72,12 @@
         </div>
 
         <div class="text-center mt-3">
-            <a href="{% url 'word_list' %}" class="btn btn-outline-secondary me-2">
-                <i class="bi bi-arrow-left me-1"></i>Back to list
+            <a href="{% if word.collection %}{% url 'collection_detail' word.collection.pk %}{% else %}{% url 'word_list' %}{% endif %}"
+               class="btn btn-outline-secondary me-2">
+                <i class="bi bi-arrow-left me-1"></i>Назад
             </a>
             <a href="{% url 'quiz_start' %}" class="btn btn-warning">
-                <i class="bi bi-lightning-fill me-1"></i>Practice now
+                <i class="bi bi-lightning-fill me-1"></i>Начать тест
             </a>
         </div>
     </div>

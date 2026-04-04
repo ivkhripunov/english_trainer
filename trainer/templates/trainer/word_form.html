@@ -1,5 +1,5 @@
 {% extends "trainer/base.html" %}
-{% block title %}{{ title }} — English Trainer{% endblock %}
+{% block title %}{{ title }} — Тренажёр языков{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -7,10 +7,10 @@
 
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'word_list' %}">Words</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'word_list' %}">Слова</a></li>
                 {% if word %}
                     <li class="breadcrumb-item">
-                        <a href="{% url 'word_detail' word.pk %}">{{ word.english }}</a>
+                        <a href="{% url 'word_detail' word.pk %}">{{ word.original }}</a>
                     </li>
                 {% endif %}
                 <li class="breadcrumb-item active">{{ title }}</li>
@@ -25,7 +25,6 @@
             <div class="card-body p-4">
                 <form method="post" novalidate>
                     {% csrf_token %}
-
                     {% for field in form %}
                     <div class="mb-3">
                         <label for="{{ field.id_for_label }}" class="form-label fw-semibold">
@@ -41,9 +40,6 @@
                                     <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
                                 </div>
                             {% endfor %}
-                        {% endif %}
-                        {% if field.help_text %}
-                            <div class="form-text">{{ field.help_text }}</div>
                         {% endif %}
                     </div>
                     {% endfor %}
@@ -62,7 +58,7 @@
                         </button>
                         <a href="{% if word %}{% url 'word_detail' word.pk %}{% else %}{% url 'word_list' %}{% endif %}"
                            class="btn btn-outline-secondary">
-                            Cancel
+                            Отмена
                         </a>
                     </div>
                 </form>

@@ -1,33 +1,33 @@
 {% extends "trainer/base.html" %}
-{% block title %}All Words — Language Trainer{% endblock %}
+{% block title %}Все слова — Тренажёр языков{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="fw-bold mb-0">
-        <i class="bi bi-list-ul me-2 text-primary"></i>All Words
+        <i class="bi bi-list-ul me-2 text-primary"></i>Все слова
     </h2>
     <a href="{% url 'word_create' %}" class="btn btn-primary">
-        <i class="bi bi-plus-lg me-1"></i>Add Word
+        <i class="bi bi-plus-lg me-1"></i>Добавить слово
     </a>
 </div>
 
-<!-- Filters -->
+<!-- Фильтры -->
 <div class="card mb-4">
     <div class="card-body">
         <form method="get" class="row g-2 align-items-end">
             <div class="col-sm-4">
-                <label class="form-label small fw-semibold text-muted">Search</label>
+                <label class="form-label small fw-semibold text-muted">Поиск</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
                     <input type="text" name="search" class="form-control"
-                           placeholder="Search word or translation..."
+                           placeholder="Слово или перевод..."
                            value="{{ search }}">
                 </div>
             </div>
             <div class="col-sm-3">
-                <label class="form-label small fw-semibold text-muted">Collection</label>
+                <label class="form-label small fw-semibold text-muted">Подборка</label>
                 <select name="collection" class="form-select">
-                    <option value="">All collections</option>
+                    <option value="">Все подборки</option>
                     {% for col in collections %}
                         <option value="{{ col.pk }}"
                             {% if collection_filter == col.pk|stringformat:'s' %}selected{% endif %}>
@@ -37,7 +37,7 @@
                 </select>
             </div>
             <div class="col-sm-3">
-                <label class="form-label small fw-semibold text-muted">Sort by</label>
+                <label class="form-label small fw-semibold text-muted">Сортировка</label>
                 <select name="sort" class="form-select">
                     {% for value, label in sort_options.items %}
                         <option value="{{ value }}" {% if sort == value %}selected{% endif %}>
@@ -47,14 +47,14 @@
                 </select>
             </div>
             <div class="col-sm-2 d-grid">
-                <button type="submit" class="btn btn-outline-primary">Apply</button>
+                <button type="submit" class="btn btn-outline-primary">Применить</button>
             </div>
         </form>
     </div>
 </div>
 
 <p class="text-muted small mb-3">
-    <strong>{{ total_count }}</strong> word{{ total_count|pluralize }} found
+    Найдено слов: <strong>{{ total_count }}</strong>
 </p>
 
 {% if words %}
@@ -63,11 +63,11 @@
         <table class="table table-hover mb-0 align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>Original</th>
-                    <th>Translation</th>
-                    <th class="d-none d-md-table-cell">Collection</th>
-                    <th class="text-center">Accuracy</th>
-                    <th class="text-end">Actions</th>
+                    <th>Оригинал</th>
+                    <th>Перевод</th>
+                    <th class="d-none d-md-table-cell">Подборка</th>
+                    <th class="text-center">Точность</th>
+                    <th class="text-end">Действия</th>
                 </tr>
             </thead>
             <tbody>
@@ -87,14 +87,14 @@
                                 {{ word.collection.name }}
                             </a>
                         {% else %}
-                            <span class="fst-italic opacity-50">No collection</span>
+                            <span class="fst-italic opacity-50">Без подборки</span>
                         {% endif %}
                     </td>
                     <td class="text-center">
                         {% if word.times_shown > 0 %}
                             <span class="badge bg-{{ word.accuracy_color }}">{{ word.accuracy }}%</span>
                         {% else %}
-                            <span class="badge bg-secondary">New</span>
+                            <span class="badge bg-secondary">Новое</span>
                         {% endif %}
                     </td>
                     <td class="text-end">
@@ -116,9 +116,9 @@
 {% else %}
 <div class="card text-center py-5">
     <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
-    <h5 class="text-muted">No words found</h5>
+    <h5 class="text-muted">Ничего не найдено</h5>
     <a href="{% url 'word_list' %}" class="btn btn-outline-secondary mt-2 mx-auto"
-       style="width:fit-content;">Clear filters</a>
+       style="width:fit-content;">Сбросить фильтры</a>
 </div>
 {% endif %}
 {% endblock %}
