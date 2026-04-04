@@ -1,19 +1,19 @@
 {% extends "trainer/base.html" %}
-{% block title %}Start Quiz — Language Trainer{% endblock %}
+{% block title %}Начать тест — Тренажёр языков{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6 col-lg-5">
         <div class="text-center mb-4">
             <i class="bi bi-lightning-fill text-warning" style="font-size: 3rem;"></i>
-            <h2 class="fw-bold mt-2">Start a Quiz</h2>
-            <p class="text-muted">Select a collection and test yourself</p>
+            <h2 class="fw-bold mt-2">Начать тест</h2>
+            <p class="text-muted">Выберите подборку и проверьте себя</p>
         </div>
 
         {% if can_start %}
         <div class="card">
             <div class="card-header bg-white fw-semibold">
-                <i class="bi bi-sliders me-2 text-primary"></i>Quiz Settings
+                <i class="bi bi-sliders me-2 text-primary"></i>Настройки теста
             </div>
             <div class="card-body p-4">
                 <form method="post">
@@ -31,26 +31,26 @@
                     {% endfor %}
                     <div class="d-grid mt-2">
                         <button type="submit" class="btn btn-warning btn-lg fw-bold">
-                            <i class="bi bi-play-fill me-1"></i>Let's Go!
+                            <i class="bi bi-play-fill me-1"></i>Начать!
                         </button>
                     </div>
                 </form>
             </div>
             <div class="card-footer text-muted small text-center">
-                {{ word_count }} word{{ word_count|pluralize }} available in total
+                Всего доступно слов: {{ word_count }}
             </div>
         </div>
         {% else %}
         <div class="card text-center py-5">
             <i class="bi bi-journal-x text-muted fs-1 mb-3"></i>
-            <h5 class="text-muted">No words yet</h5>
-            <p class="text-muted small">Add words to a collection first.</p>
+            <h5 class="text-muted">Слов пока нет</h5>
+            <p class="text-muted small">Сначала добавьте слова в подборку.</p>
             <div class="d-flex gap-2 justify-content-center mt-2">
                 <a href="{% url 'language_list' %}" class="btn btn-outline-primary btn-sm">
-                    Add Language
+                    Добавить язык
                 </a>
                 <a href="{% url 'collection_create' %}" class="btn btn-primary btn-sm">
-                    New Collection
+                    Новая подборка
                 </a>
             </div>
         </div>

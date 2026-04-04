@@ -1,55 +1,55 @@
 {% extends "trainer/base.html" %}
-{% block title %}Quiz Results — English Trainer{% endblock %}
+{% block title %}Результаты теста — Тренажёр языков{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8 col-lg-7">
 
-        <!-- Score card -->
+        <!-- Итог -->
         <div class="card text-center mb-4">
             <div class="card-body p-4">
                 <div style="font-size: 4rem;">{{ grade_icon }}</div>
                 <h2 class="fw-bold mt-2 mb-1">{{ grade_text }}</h2>
                 <div class="display-4 fw-bold text-{{ grade_color }} mb-1">{{ score }}%</div>
                 <p class="text-muted">
-                    You got <strong>{{ correct_count }}</strong> out of
-                    <strong>{{ total }}</strong> correct
+                    Правильных ответов: <strong>{{ correct_count }}</strong> из
+                    <strong>{{ total }}</strong>
                 </p>
                 <div class="progress mx-auto mb-4" style="height: 12px; max-width: 300px;">
                     <div class="progress-bar bg-{{ grade_color }}" style="width: {{ score }}%;"></div>
                 </div>
                 <div class="d-flex gap-2 justify-content-center flex-wrap">
                     <a href="{% url 'quiz_start' %}" class="btn btn-warning btn-lg">
-                        <i class="bi bi-arrow-repeat me-1"></i>Try Again
+                        <i class="bi bi-arrow-repeat me-1"></i>Пройти ещё раз
                     </a>
                     <a href="{% url 'index' %}" class="btn btn-outline-secondary btn-lg">
-                        <i class="bi bi-house me-1"></i>Home
+                        <i class="bi bi-house me-1"></i>Главная
                     </a>
                 </div>
             </div>
         </div>
 
-        <!-- Detailed results -->
+        <!-- Детали -->
         <div class="card">
             <div class="card-header bg-white fw-semibold">
-                <i class="bi bi-card-checklist me-2 text-primary"></i>Detailed Results
+                <i class="bi bi-card-checklist me-2 text-primary"></i>Подробные результаты
             </div>
             <div class="table-responsive">
                 <table class="table table-hover mb-0 align-middle">
                     <thead class="table-light">
                         <tr>
                             <th>#</th>
-                            <th>Word</th>
-                            <th>Correct Answer</th>
-                            <th>Your Answer</th>
-                            <th class="text-center">Result</th>
+                            <th>Слово</th>
+                            <th>Правильный ответ</th>
+                            <th>Ваш ответ</th>
+                            <th class="text-center">Итог</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for result in results %}
                         <tr class="{% if result.is_correct %}table-success{% else %}table-danger{% endif %} bg-opacity-25">
                             <td class="text-muted small">{{ forloop.counter }}</td>
-                            <td class="fw-semibold">{{ result.english }}</td>
+                            <td class="fw-semibold">{{ result.original }}</td>
                             <td>{{ result.correct_answer }}</td>
                             <td>
                                 {% if result.is_correct %}
