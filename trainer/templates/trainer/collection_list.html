@@ -1,23 +1,23 @@
 {% extends "trainer/base.html" %}
-{% block title %}Collections — Language Trainer{% endblock %}
+{% block title %}Подборки — Тренажёр языков{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="fw-bold mb-0">
-        <i class="bi bi-journals me-2 text-primary"></i>Collections
+        <i class="bi bi-journals me-2 text-primary"></i>Подборки
     </h2>
     <a href="{% url 'collection_create' %}" class="btn btn-primary">
-        <i class="bi bi-plus-lg me-1"></i>New Collection
+        <i class="bi bi-plus-lg me-1"></i>Новая подборка
     </a>
 </div>
 
-<!-- Language filter -->
+<!-- Фильтр по языку -->
 {% if languages %}
 <div class="mb-4">
     <div class="d-flex gap-2 flex-wrap">
         <a href="{% url 'collection_list' %}"
            class="btn btn-sm {% if not language_filter %}btn-primary{% else %}btn-outline-secondary{% endif %}">
-            All languages
+            Все языки
         </a>
         {% for lang in languages %}
         <a href="?language={{ lang.pk }}"
@@ -40,7 +40,7 @@
                     {% if col.total_shown > 0 %}
                         <span class="badge bg-{{ col.accuracy_color }}">{{ col.accuracy }}%</span>
                     {% else %}
-                        <span class="badge bg-secondary">New</span>
+                        <span class="badge bg-secondary">Новая</span>
                     {% endif %}
                 </div>
                 <h5 class="fw-bold mb-1">
@@ -52,7 +52,7 @@
                     <p class="text-muted small mb-2">{{ col.description|truncatechars:80 }}</p>
                 {% endif %}
                 <p class="text-muted small mb-3">
-                    <i class="bi bi-card-text me-1"></i>{{ col.word_count }} word{{ col.word_count|pluralize }}
+                    <i class="bi bi-card-text me-1"></i>{{ col.word_count }} слов
                 </p>
                 {% if col.total_shown > 0 %}
                 <div class="progress mb-3" style="height: 6px;">
@@ -64,18 +64,18 @@
             <div class="card-footer bg-white d-flex gap-2">
                 <a href="{% url 'collection_detail' col.pk %}"
                    class="btn btn-sm btn-outline-primary flex-grow-1">
-                    <i class="bi bi-eye me-1"></i>Open
+                    <i class="bi bi-eye me-1"></i>Открыть
                 </a>
                 <a href="{% url 'quiz_start' %}?collection={{ col.pk }}"
-                   class="btn btn-sm btn-warning">
+                   class="btn btn-sm btn-warning" title="Тест по подборке">
                     <i class="bi bi-lightning-fill"></i>
                 </a>
                 <a href="{% url 'collection_edit' col.pk %}"
-                   class="btn btn-sm btn-outline-secondary">
+                   class="btn btn-sm btn-outline-secondary" title="Редактировать">
                     <i class="bi bi-pencil"></i>
                 </a>
                 <a href="{% url 'collection_delete' col.pk %}"
-                   class="btn btn-sm btn-outline-danger">
+                   class="btn btn-sm btn-outline-danger" title="Удалить">
                     <i class="bi bi-trash"></i>
                 </a>
             </div>
@@ -86,9 +86,9 @@
 {% else %}
 <div class="card text-center py-5">
     <i class="bi bi-journals text-muted fs-1 mb-3"></i>
-    <h5 class="text-muted">No collections yet</h5>
+    <h5 class="text-muted">Подборок пока нет</h5>
     <a href="{% url 'collection_create' %}" class="btn btn-primary mt-2 mx-auto" style="width:fit-content;">
-        <i class="bi bi-plus-lg me-1"></i>Create first collection
+        <i class="bi bi-plus-lg me-1"></i>Создать первую подборку
     </a>
 </div>
 {% endif %}

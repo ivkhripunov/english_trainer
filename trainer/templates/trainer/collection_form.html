@@ -1,5 +1,5 @@
 {% extends "trainer/base.html" %}
-{% block title %}{{ title }} — Language Trainer{% endblock %}
+{% block title %}{{ title }} — Тренажёр языков{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -7,7 +7,7 @@
 
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'collection_list' %}">Collections</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'collection_list' %}">Подборки</a></li>
                 {% if collection %}
                     <li class="breadcrumb-item">
                         <a href="{% url 'collection_detail' collection.pk %}">{{ collection.name }}</a>
@@ -46,7 +46,7 @@
                         </button>
                         <a href="{% if collection %}{% url 'collection_detail' collection.pk %}{% else %}{% url 'collection_list' %}{% endif %}"
                            class="btn btn-outline-secondary">
-                            Cancel
+                            Отмена
                         </a>
                     </div>
                 </form>

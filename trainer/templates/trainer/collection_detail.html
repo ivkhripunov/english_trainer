@@ -1,15 +1,15 @@
 {% extends "trainer/base.html" %}
-{% block title %}{{ collection.name }} — Language Trainer{% endblock %}
+{% block title %}{{ collection.name }} — Тренажёр языков{% endblock %}
 
 {% block content %}
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'collection_list' %}">Collections</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'collection_list' %}">Подборки</a></li>
         <li class="breadcrumb-item active">{{ collection.name }}</li>
     </ol>
 </nav>
 
-<!-- Header -->
+<!-- Заголовок подборки -->
 <div class="card mb-4">
     <div class="card-body p-4">
         <div class="row align-items-center">
@@ -20,10 +20,10 @@
                     <p class="text-muted mb-2">{{ collection.description }}</p>
                 {% endif %}
                 <div class="d-flex gap-3 text-muted small">
-                    <span><i class="bi bi-card-text me-1"></i>{{ collection.word_count }} words</span>
+                    <span><i class="bi bi-card-text me-1"></i>{{ collection.word_count }} слов</span>
                     {% if collection.total_shown > 0 %}
                         <span>
-                            <i class="bi bi-bullseye me-1"></i>Accuracy:
+                            <i class="bi bi-bullseye me-1"></i>Точность:
                             <span class="text-{{ collection.accuracy_color }} fw-semibold">
                                 {{ collection.accuracy }}%
                             </span>
@@ -34,11 +34,11 @@
             <div class="col-md-4 d-flex gap-2 justify-content-md-end mt-3 mt-md-0 flex-wrap">
                 <a href="{% url 'word_create' %}?collection={{ collection.pk }}"
                    class="btn btn-primary">
-                    <i class="bi bi-plus-lg me-1"></i>Add Word
+                    <i class="bi bi-plus-lg me-1"></i>Добавить слово
                 </a>
                 <a href="{% url 'quiz_start' %}?collection={{ collection.pk }}"
                    class="btn btn-warning">
-                    <i class="bi bi-lightning-fill me-1"></i>Quiz
+                    <i class="bi bi-lightning-fill me-1"></i>Тест
                 </a>
                 <a href="{% url 'collection_edit' collection.pk %}"
                    class="btn btn-outline-secondary">
@@ -59,18 +59,18 @@
     </div>
 </div>
 
-<!-- Words table -->
+<!-- Таблица слов -->
 {% if words %}
 <div class="card">
     <div class="table-responsive">
         <table class="table table-hover mb-0 align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>Original</th>
-                    <th>Translation</th>
-                    <th class="d-none d-md-table-cell">Example</th>
-                    <th class="text-center">Accuracy</th>
-                    <th class="text-end">Actions</th>
+                    <th>Оригинал</th>
+                    <th>Перевод</th>
+                    <th class="d-none d-md-table-cell">Пример</th>
+                    <th class="text-center">Точность</th>
+                    <th class="text-end">Действия</th>
                 </tr>
             </thead>
             <tbody>
@@ -89,7 +89,7 @@
                         {% if word.times_shown > 0 %}
                             <span class="badge bg-{{ word.accuracy_color }}">{{ word.accuracy }}%</span>
                         {% else %}
-                            <span class="badge bg-secondary">New</span>
+                            <span class="badge bg-secondary">Новое</span>
                         {% endif %}
                     </td>
                     <td class="text-end">
@@ -111,10 +111,10 @@
 {% else %}
 <div class="card text-center py-5">
     <i class="bi bi-inbox text-muted fs-1 mb-3"></i>
-    <h5 class="text-muted">No words in this collection yet</h5>
+    <h5 class="text-muted">В подборке пока нет слов</h5>
     <a href="{% url 'word_create' %}?collection={{ collection.pk }}"
        class="btn btn-primary mt-2 mx-auto" style="width:fit-content;">
-        <i class="bi bi-plus-lg me-1"></i>Add first word
+        <i class="bi bi-plus-lg me-1"></i>Добавить первое слово
     </a>
 </div>
 {% endif %}

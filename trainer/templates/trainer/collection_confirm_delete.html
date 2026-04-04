@@ -1,30 +1,30 @@
 {% extends "trainer/base.html" %}
-{% block title %}Delete Collection — Language Trainer{% endblock %}
+{% block title %}Удаление подборки — Тренажёр языков{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-5">
         <div class="card border-danger">
             <div class="card-header bg-danger text-white">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Deletion
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>Подтверждение удаления
             </div>
             <div class="card-body text-center p-4">
                 <i class="bi bi-journals text-danger mb-3" style="font-size: 3rem;"></i>
-                <h5>Delete collection</h5>
+                <h5>Удалить подборку</h5>
                 <p class="fs-4 fw-bold text-primary">{{ collection.name }}</p>
                 <p class="text-muted small">
-                    This will delete all <strong>{{ collection.word_count }}</strong>
-                    word{{ collection.word_count|pluralize }} in this collection.
-                    This action cannot be undone.
+                    Вместе с подборкой будут удалены все
+                    <strong>{{ collection.word_count }}</strong> слов.
+                    Это действие нельзя отменить.
                 </p>
                 <form method="post" class="d-flex gap-2 justify-content-center">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger px-4">
-                        <i class="bi bi-trash me-1"></i>Yes, delete
+                        <i class="bi bi-trash me-1"></i>Да, удалить
                     </button>
                     <a href="{% url 'collection_detail' collection.pk %}"
                        class="btn btn-outline-secondary px-4">
-                        Cancel
+                        Отмена
                     </a>
                 </form>
             </div>
