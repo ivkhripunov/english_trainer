@@ -1,14 +1,14 @@
 {% extends "trainer/base.html" %}
-{% block title %}Languages — Language Trainer{% endblock %}
+{% block title %}Языки — Тренажёр языков{% endblock %}
 
 {% block content %}
 <div class="row g-4">
 
-    <!-- Left: language list -->
+    <!-- Список языков -->
     <div class="col-md-7">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="fw-bold mb-0">
-                <i class="bi bi-globe2 me-2 text-primary"></i>Languages
+                <i class="bi bi-globe2 me-2 text-primary"></i>Языки
             </h2>
         </div>
 
@@ -23,14 +23,14 @@
                             <span class="text-muted ms-2">/ {{ lang.native_name }}</span>
                         {% endif %}
                         <div class="text-muted small mt-1">
-                            {{ lang.collection_count }} collection{{ lang.collection_count|pluralize }}
-                            &middot; {{ lang.word_count }} word{{ lang.word_count|pluralize }}
+                            {{ lang.collection_count }} подборок
+                            &middot; {{ lang.word_count }} слов
                         </div>
                     </div>
                     <div class="d-flex gap-2">
                         <a href="{% url 'collection_list' %}?language={{ lang.pk }}"
                            class="btn btn-sm btn-outline-primary">
-                            <i class="bi bi-journals me-1"></i>Collections
+                            <i class="bi bi-journals me-1"></i>Подборки
                         </a>
                         <a href="{% url 'language_delete' lang.pk %}"
                            class="btn btn-sm btn-outline-danger">
@@ -44,17 +44,17 @@
         {% else %}
         <div class="card text-center py-5">
             <i class="bi bi-globe2 text-muted fs-1 mb-3"></i>
-            <h5 class="text-muted">No languages yet</h5>
-            <p class="text-muted small">Add your first language using the form on the right.</p>
+            <h5 class="text-muted">Языков пока нет</h5>
+            <p class="text-muted small">Добавьте первый язык с помощью формы справа.</p>
         </div>
         {% endif %}
     </div>
 
-    <!-- Right: add language form -->
+    <!-- Форма добавления -->
     <div class="col-md-5">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <i class="bi bi-plus-circle me-2"></i>Add Language
+                <i class="bi bi-plus-circle me-2"></i>Добавить язык
             </div>
             <div class="card-body p-4">
                 <form method="post" novalidate>
@@ -73,7 +73,7 @@
                     </div>
                     {% endfor %}
                     <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-plus-lg me-1"></i>Add Language
+                        <i class="bi bi-plus-lg me-1"></i>Добавить язык
                     </button>
                 </form>
             </div>
@@ -81,12 +81,12 @@
 
         <div class="card mt-3">
             <div class="card-body text-center p-3">
-                <p class="text-muted small mb-2">Ready to add words?</p>
+                <p class="text-muted small mb-2">Готовы добавлять слова?</p>
                 <a href="{% url 'collection_create' %}" class="btn btn-outline-primary btn-sm me-2">
-                    <i class="bi bi-journals me-1"></i>New Collection
+                    <i class="bi bi-journals me-1"></i>Новая подборка
                 </a>
                 <a href="{% url 'word_create' %}" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-plus-circle me-1"></i>Add Word
+                    <i class="bi bi-plus-circle me-1"></i>Добавить слово
                 </a>
             </div>
         </div>
