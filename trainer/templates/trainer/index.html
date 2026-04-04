@@ -1,22 +1,22 @@
 {% extends "trainer/base.html" %}
-{% block title %}Language Trainer — Home{% endblock %}
+{% block title %}Тренажёр языков — Главная{% endblock %}
 
 {% block content %}
-<!-- Hero -->
+<!-- Герой -->
 <div class="card bg-primary text-white p-4 mb-4">
     <div class="row align-items-center">
         <div class="col-md-8">
             <h1 class="fw-bold mb-1">
-                <i class="bi bi-translate me-2"></i>Language Trainer
+                <i class="bi bi-translate me-2"></i>Тренажёр языков
             </h1>
             <p class="mb-3 opacity-75">
-                Учи слова на любом языке. Создавай подборки и тренируйся с квизами.
+                Учи слова на любом языке. Создавай подборки и тренируйся с тестами.
             </p>
             <a href="{% url 'quiz_start' %}" class="btn btn-warning btn-lg fw-bold me-2">
-                <i class="bi bi-lightning-fill me-1"></i>Start Quiz
+                <i class="bi bi-lightning-fill me-1"></i>Начать тест
             </a>
             <a href="{% url 'collection_create' %}" class="btn btn-outline-light btn-lg">
-                <i class="bi bi-plus-lg me-1"></i>New Collection
+                <i class="bi bi-plus-lg me-1"></i>Новая подборка
             </a>
         </div>
         <div class="col-md-4 text-center d-none d-md-block">
@@ -25,42 +25,42 @@
     </div>
 </div>
 
-<!-- Stats -->
+<!-- Статистика -->
 <div class="row g-3 mb-4">
     <div class="col-sm-3">
         <div class="card stat-card border-primary h-100 p-3">
-            <div class="text-muted small mb-1">Languages</div>
+            <div class="text-muted small mb-1">Языков</div>
             <div class="fs-2 fw-bold text-primary">{{ total_languages }}</div>
         </div>
     </div>
     <div class="col-sm-3">
         <div class="card stat-card border-info h-100 p-3">
-            <div class="text-muted small mb-1">Collections</div>
+            <div class="text-muted small mb-1">Подборок</div>
             <div class="fs-2 fw-bold text-info">{{ total_collections }}</div>
         </div>
     </div>
     <div class="col-sm-3">
         <div class="card stat-card border-secondary h-100 p-3">
-            <div class="text-muted small mb-1">Total words</div>
+            <div class="text-muted small mb-1">Всего слов</div>
             <div class="fs-2 fw-bold text-secondary">{{ total_words }}</div>
         </div>
     </div>
     <div class="col-sm-3">
         <div class="card stat-card border-success h-100 p-3">
-            <div class="text-muted small mb-1">Overall accuracy</div>
+            <div class="text-muted small mb-1">Точность</div>
             <div class="fs-2 fw-bold text-success">{{ overall_accuracy }}%</div>
         </div>
     </div>
 </div>
 
 <div class="row g-3">
-    <!-- Recent collections -->
+    <!-- Последние подборки -->
     <div class="col-md-7">
         <div class="card h-100">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-journals me-2 text-primary"></i>Recent Collections</span>
+                <span><i class="bi bi-journals me-2 text-primary"></i>Последние подборки</span>
                 <a href="{% url 'collection_list' %}" class="btn btn-sm btn-outline-primary">
-                    View all
+                    Все подборки
                 </a>
             </div>
             <div class="card-body p-0">
@@ -75,7 +75,7 @@
                                 {{ col.name }}
                             </a>
                             <span class="text-muted ms-2 small">
-                                {{ col.word_count }} word{{ col.word_count|pluralize }}
+                                {{ col.word_count }} сл.
                             </span>
                         </div>
                         <a href="{% url 'quiz_start' %}?collection={{ col.pk }}"
@@ -88,19 +88,19 @@
                 {% else %}
                 <div class="text-center text-muted py-4">
                     <i class="bi bi-journals fs-2 d-block mb-2"></i>
-                    No collections yet.
-                    <a href="{% url 'collection_create' %}">Create one!</a>
+                    Подборок пока нет.
+                    <a href="{% url 'collection_create' %}">Создать первую!</a>
                 </div>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- Hardest words -->
+    <!-- Сложные слова -->
     <div class="col-md-5">
         <div class="card h-100">
             <div class="card-header bg-white">
-                <i class="bi bi-fire me-2 text-danger"></i>Hardest Words
+                <i class="bi bi-fire me-2 text-danger"></i>Сложные слова
             </div>
             <div class="card-body p-0">
                 {% if hardest_words %}
@@ -128,7 +128,7 @@
                 {% else %}
                 <div class="text-center text-muted py-4">
                     <i class="bi bi-check-circle fs-2 d-block mb-2 text-success"></i>
-                    No data yet — start a quiz!
+                    Данных пока нет — пройди тест!
                 </div>
                 {% endif %}
             </div>
