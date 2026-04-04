@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Language Trainer{% endblock %}</title>
+    <title>{% block title %}Тренажёр языков{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -25,7 +25,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
     <div class="container">
         <a class="navbar-brand" href="{% url 'index' %}">
-            <i class="bi bi-translate me-1"></i>Language Trainer
+            <i class="bi bi-translate me-1"></i>Тренажёр языков
         </a>
         <button class="navbar-toggler" type="button"
                 data-bs-toggle="collapse" data-bs-target="#navMenu">
@@ -35,7 +35,7 @@
             <ul class="navbar-nav ms-auto gap-1">
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'index' %}">
-                        <i class="bi bi-house-door"></i> Home
+                        <i class="bi bi-house-door"></i> Главная
                     </a>
                 </li>
                 <li class="nav-item dropdown">
@@ -45,23 +45,23 @@
                     <ul class="dropdown-menu">
                         <li>
                             <a class="dropdown-item" href="{% url 'language_list' %}">
-                                <i class="bi bi-globe2 me-2"></i>Languages
+                                <i class="bi bi-globe2 me-2"></i>Языки
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item" href="{% url 'collection_list' %}">
-                                <i class="bi bi-journals me-2"></i>Collections
+                                <i class="bi bi-journals me-2"></i>Подборки
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <a class="dropdown-item" href="{% url 'word_list' %}">
-                                <i class="bi bi-list-ul me-2"></i>All Words
+                                <i class="bi bi-list-ul me-2"></i>Все слова
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item" href="{% url 'word_create' %}">
-                                <i class="bi bi-plus-circle me-2"></i>Add Word
+                                <i class="bi bi-plus-circle me-2"></i>Добавить слово
                             </a>
                         </li>
                     </ul>
@@ -69,7 +69,7 @@
                 <li class="nav-item">
                     <a class="nav-link btn btn-warning btn-sm text-dark px-3 ms-2"
                        href="{% url 'quiz_start' %}">
-                        <i class="bi bi-lightning-fill"></i> Quiz
+                        <i class="bi bi-lightning-fill"></i> Тест
                     </a>
                 </li>
             </ul>
@@ -90,7 +90,7 @@
 </div>
 
 <footer class="text-center text-muted py-3 mt-3">
-    <small><i class="bi bi-translate me-1"></i>Language Trainer &copy; 2025</small>
+    <small><i class="bi bi-translate me-1"></i>Тренажёр языков &copy; 2026</small>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
