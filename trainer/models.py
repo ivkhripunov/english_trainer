@@ -78,17 +78,17 @@ class Collection(models.Model):
 
     @property
     def total_shown(self):
-        """Return total times words in this collection were shown."""
+        """Return total times words were shown."""
         return sum(w.times_shown for w in self.words.all())
 
     @property
     def total_correct(self):
-        """Return total correct answers for this collection."""
+        """Return total correct answers."""
         return sum(w.times_correct for w in self.words.all())
 
     @property
     def accuracy(self):
-        """Return overall accuracy percentage for this collection."""
+        """Return overall accuracy percentage."""
         shown = self.total_shown
         if shown == 0:
             return 0
@@ -147,10 +147,59 @@ class Word(models.Model):
 
     @property
     def accuracy(self):
-        """Calculate accuracy percentage for this word."""
+        """Calculate accuracy percentage."""
         if self.times_shown == 0:
             return 0
         return round(self.times_correct / self.times_shown * 100)
+
+    @property
+    def accuracy_color(self):
+        """Return Bootstrap color class based on accuracy."""
+        acc = self.accuracy
+        if acc >= 80:
+            return 'success'
+        if acc >= 50:
+            return 'warning'
+        return 'danger'
+
+
+class QuizResult(models.Model):
+    """Stores the result of a completed quiz session."""
+
+    collection = models.ForeignKey(
+        Collection,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='quiz_results',
+        verbose_name='Collection',
+    )
+    score = models.PositiveIntegerField(default=0, verbose_name='Correct answers')
+    total = models.PositiveIntegerField(default=1, verbose_name='Total questions')
+    direction = models.CharField(
+        max_length=20,
+        default='orig_trans',
+        verbose_name='Quiz direction',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """Meta options for QuizResult model."""
+
+        ordering = ['-created_at']
+        verbose_name = 'Quiz Result'
+        verbose_name_plural = 'Quiz Results'
+
+    def __str__(self):
+        """Return string representation."""
+        return f"Тест {self.created_at.strftime('%d.%m.%Y')}: {self.score}/{self.total}"
+
+    @property
+    def accuracy(self):
+        """Return accuracy percentage."""
+        if self.total == 0:
+            return 0
+        return round(self.score / self.total * 100)
 
     @property
     def accuracy_color(self):

@@ -5,6 +5,13 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
 
+    # Profile
+    path('profile/', views.profile, name='profile'),
+
+    # External API proxies
+    path('api/translate/', views.api_suggest_translation, name='api_translate'),
+    path('api/example/', views.api_suggest_example, name='api_example'),
+
     # Languages
     path('languages/', views.language_list, name='language_list'),
     path('languages/<int:pk>/delete/', views.language_delete, name='language_delete'),
