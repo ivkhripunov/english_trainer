@@ -314,7 +314,11 @@ def quiz_start(request):
 
             return redirect('quiz_question')
     else:
-        form = QuizSettingsForm()
+        initial = {}
+        preselect = request.GET.get('collection')
+        if preselect:
+            initial['collection'] = preselect
+        form = QuizSettingsForm(initial=initial)
 
     word_count = Word.objects.count()
     context = {
