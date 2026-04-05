@@ -4,16 +4,20 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db.models import Q, Sum
 
-from .models import Word
-from .forms import WordForm, QuizAnswerForm, QuizSettingsForm
+from .models import Word, Collection, Language
+from .forms import WordForm, QuizAnswerForm, QuizSettingsForm, CollectionForm, LanguageForm
 
 MIN_WORDS_FOR_QUIZ = 1
 
 
+# ── Home ──────────────────────────────────────────────────────────────────────
+
 def index(request):
     """Render the home page with overall statistics."""
     total_words = Word.objects.count()
-    recent_words = Word.objects.order_by('-created_at')[:5]
+    total_collections = Collection.objects.count()
+    total_languages = Language.objects.count()
+    recent_collections = Collection.objects.select_related('language').order_by('-created_at')[:4]
 
     aggregates = Word.objects.aggregate(
         total_shown=Sum('times_shown'),
@@ -27,46 +31,177 @@ def index(request):
 
     hardest_words = (
         Word.objects.filter(times_shown__gt=0)
+        .select_related('collection__language')
         .order_by('times_correct', '-times_shown')[:3]
     )
 
     context = {
         'total_words': total_words,
-        'recent_words': recent_words,
+        'total_collections': total_collections,
+        'total_languages': total_languages,
         'overall_accuracy': overall_accuracy,
         'total_shown': total_shown,
+        'recent_collections': recent_collections,
         'hardest_words': hardest_words,
     }
     return render(request, 'trainer/index.html', context)
 
 
+# ── Language views ────────────────────────────────────────────────────────────
+
+def language_list(request):
+    """Render the list of all languages with inline create form."""
+    if request.method == 'POST':
+        form = LanguageForm(request.POST)
+        if form.is_valid():
+            lang = form.save()
+            messages.success(request, f"✅ Language «{lang.name}» added.")
+            return redirect('language_list')
+    else:
+        form = LanguageForm()
+
+    languages = Language.objects.all()
+    context = {'languages': languages, 'form': form}
+    return render(request, 'trainer/language_list.html', context)
+
+
+def language_delete(request, pk):
+    """Delete a language after confirmation."""
+    language = get_object_or_404(Language, pk=pk)
+
+    if request.method == 'POST':
+        name = language.name
+        language.delete()
+        messages.warning(request, f"🗑️ Language «{name}» deleted.")
+        return redirect('language_list')
+
+    return render(request, 'trainer/language_confirm_delete.html', {'language': language})
+
+
+# ── Collection views ──────────────────────────────────────────────────────────
+
+def collection_list(request):
+    """Render the list of all collections."""
+    language_filter = request.GET.get('language', '')
+    queryset = Collection.objects.select_related('language')
+
+    if language_filter:
+        queryset = queryset.filter(language__pk=language_filter)
+
+    languages = Language.objects.all()
+    context = {
+        'collections': queryset,
+        'languages': languages,
+        'language_filter': language_filter,
+    }
+    return render(request, 'trainer/collection_list.html', context)
+
+
+def collection_detail(request, pk):
+    """Show a collection and its words."""
+    collection = get_object_or_404(Collection, pk=pk)
+    words = collection.words.order_by('-created_at')
+    context = {'collection': collection, 'words': words}
+    return render(request, 'trainer/collection_detail.html', context)
+
+
+def collection_create(request):
+    """Handle collection creation."""
+    if not Language.objects.exists():
+        messages.warning(
+            request,
+            "⚠️ Please add at least one language before creating a collection."
+        )
+        return redirect('language_list')
+
+    if request.method == 'POST':
+        form = CollectionForm(request.POST)
+        if form.is_valid():
+            collection = form.save()
+            messages.success(request, f"✅ Collection «{collection.name}» created.")
+            return redirect('collection_detail', pk=collection.pk)
+    else:
+        form = CollectionForm()
+
+    context = {
+        'form': form,
+        'title': 'New Collection',
+        'submit_label': 'Create Collection',
+    }
+    return render(request, 'trainer/collection_form.html', context)
+
+
+def collection_edit(request, pk):
+    """Handle collection editing."""
+    collection = get_object_or_404(Collection, pk=pk)
+
+    if request.method == 'POST':
+        form = CollectionForm(request.POST, instance=collection)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"✏️ Collection «{collection.name}» updated.")
+            return redirect('collection_detail', pk=pk)
+    else:
+        form = CollectionForm(instance=collection)
+
+    context = {
+        'form': form,
+        'collection': collection,
+        'title': f'Edit: {collection.name}',
+        'submit_label': 'Save Changes',
+    }
+    return render(request, 'trainer/collection_form.html', context)
+
+
+def collection_delete(request, pk):
+    """Delete a collection after confirmation."""
+    collection = get_object_or_404(Collection, pk=pk)
+
+    if request.method == 'POST':
+        name = collection.name
+        collection.delete()
+        messages.warning(request, f"🗑️ Collection «{name}» deleted.")
+        return redirect('collection_list')
+
+    return render(request, 'trainer/collection_confirm_delete.html', {'collection': collection})
+
+
+# ── Word views ────────────────────────────────────────────────────────────────
+
 def word_list(request):
-    """Render the word list with search and sort functionality."""
-    queryset = Word.objects.all()
+    """Render the word list with search, sort, and collection filter."""
+    queryset = Word.objects.select_related('collection__language')
 
     search = request.GET.get('search', '').strip()
     sort = request.GET.get('sort', '-created_at')
+    collection_filter = request.GET.get('collection', '')
 
     if search:
         queryset = queryset.filter(
-            Q(english__icontains=search) | Q(russian__icontains=search)
+            Q(original__icontains=search) | Q(translation__icontains=search)
         )
+
+    if collection_filter:
+        queryset = queryset.filter(collection__pk=collection_filter)
 
     sort_options = {
         '-created_at': 'Newest first',
         'created_at': 'Oldest first',
-        'english': 'A–Z (English)',
-        'russian': 'А–Я (Russian)',
+        'original': 'A–Z (original)',
+        'translation': 'А–Я (translation)',
         '-times_shown': 'Most practiced',
     }
     if sort in sort_options:
         queryset = queryset.order_by(sort)
 
+    collections = Collection.objects.select_related('language')
     context = {
         'words': queryset,
         'search': search,
         'sort': sort,
         'sort_options': sort_options,
+        'collections': collections,
+        'collection_filter': collection_filter,
         'total_count': queryset.count(),
     }
     return render(request, 'trainer/word_list.html', context)
@@ -79,18 +214,21 @@ def word_detail(request, pk):
 
 
 def word_create(request):
-    """Handle word creation form."""
+    """Handle word creation."""
     if request.method == 'POST':
         form = WordForm(request.POST)
         if form.is_valid():
             word = form.save()
-            messages.success(
-                request,
-                f"✅ Word «{word.english}» has been added successfully!"
-            )
+            messages.success(request, f"✅ Word «{word.original}» added.")
+            if word.collection:
+                return redirect('collection_detail', pk=word.collection.pk)
             return redirect('word_list')
     else:
-        form = WordForm()
+        collection_pk = request.GET.get('collection')
+        initial = {}
+        if collection_pk:
+            initial['collection'] = collection_pk
+        form = WordForm(initial=initial)
 
     context = {
         'form': form,
@@ -101,14 +239,14 @@ def word_create(request):
 
 
 def word_edit(request, pk):
-    """Handle word editing form."""
+    """Handle word editing."""
     word = get_object_or_404(Word, pk=pk)
 
     if request.method == 'POST':
         form = WordForm(request.POST, instance=word)
         if form.is_valid():
             form.save()
-            messages.success(request, f"✏️ Word «{word.english}» updated.")
+            messages.success(request, f"✏️ Word «{word.original}» updated.")
             return redirect('word_detail', pk=pk)
     else:
         form = WordForm(instance=word)
@@ -116,7 +254,7 @@ def word_edit(request, pk):
     context = {
         'form': form,
         'word': word,
-        'title': f'Edit: {word.english}',
+        'title': f'Edit: {word.original}',
         'submit_label': 'Save Changes',
     }
     return render(request, 'trainer/word_form.html', context)
@@ -127,9 +265,12 @@ def word_delete(request, pk):
     word = get_object_or_404(Word, pk=pk)
 
     if request.method == 'POST':
-        english = word.english
+        original = word.original
+        collection = word.collection
         word.delete()
-        messages.warning(request, f"🗑️ Word «{english}» has been deleted.")
+        messages.warning(request, f"🗑️ Word «{original}» deleted.")
+        if collection:
+            return redirect('collection_detail', pk=collection.pk)
         return redirect('word_list')
 
     return render(request, 'trainer/word_confirm_delete.html', {'word': word})
@@ -139,28 +280,37 @@ def word_delete(request, pk):
 
 def quiz_start(request):
     """Render quiz settings page and initialise a quiz session."""
-    word_count = Word.objects.count()
-
     if request.method == 'POST':
         form = QuizSettingsForm(request.POST)
         if form.is_valid():
             count = int(form.cleaned_data['count'])
             direction = form.cleaned_data['direction']
+            collection = form.cleaned_data.get('collection')
 
-            word_ids = list(Word.objects.values_list('id', flat=True))
+            queryset = Word.objects.all()
+            if collection:
+                queryset = queryset.filter(collection=collection)
+
+            word_ids = list(queryset.values_list('id', flat=True))
             random.shuffle(word_ids)
             if count > 0:
                 word_ids = word_ids[:count]
+
+            if not word_ids:
+                messages.warning(request, "⚠️ No words found for the selected settings.")
+                return redirect('quiz_start')
 
             request.session['quiz_words'] = word_ids
             request.session['quiz_index'] = 0
             request.session['quiz_results'] = []
             request.session['quiz_direction'] = direction
+            request.session['quiz_collection'] = collection.pk if collection else None
 
             return redirect('quiz_question')
     else:
         form = QuizSettingsForm()
 
+    word_count = Word.objects.count()
     context = {
         'form': form,
         'word_count': word_count,
@@ -173,7 +323,7 @@ def quiz_question(request):
     """Show the current quiz question or redirect when quiz is complete."""
     word_ids = request.session.get('quiz_words', [])
     cur = request.session.get('quiz_index', 0)
-    direction = request.session.get('quiz_direction', 'en_ru')
+    direction = request.session.get('quiz_direction', 'orig_trans')
 
     if not word_ids or cur >= len(word_ids):
         return redirect('quiz_results')
@@ -184,7 +334,7 @@ def quiz_question(request):
         form = QuizAnswerForm(request.POST)
         if form.is_valid():
             user_answer = form.cleaned_data['answer']
-            correct = word.russian if direction == 'en_ru' else word.english
+            correct = word.translation if direction == 'orig_trans' else word.original
             is_correct = user_answer.strip().lower() == correct.strip().lower()
 
             word.times_shown += 1
@@ -194,8 +344,8 @@ def quiz_question(request):
 
             results = request.session.get('quiz_results', [])
             results.append({
-                'english': word.english,
-                'russian': word.russian,
+                'original': word.original,
+                'translation': word.translation,
                 'user_answer': user_answer,
                 'correct_answer': correct,
                 'is_correct': is_correct,
@@ -208,7 +358,7 @@ def quiz_question(request):
     else:
         form = QuizAnswerForm()
 
-    question_text = word.english if direction == 'en_ru' else word.russian
+    question_text = word.original if direction == 'orig_trans' else word.translation
     total = len(word_ids)
     progress = round(cur / total * 100) if total > 0 else 0
 
@@ -219,6 +369,7 @@ def quiz_question(request):
         'current': cur + 1,
         'total': total,
         'progress': progress,
+        'language': word.collection.language.name if word.collection else '',
     }
     return render(request, 'trainer/quiz_question.html', context)
 
@@ -243,7 +394,7 @@ def quiz_results(request):
     else:
         grade = ('📚', 'Keep practising!', 'danger')
 
-    for key in ['quiz_words', 'quiz_index', 'quiz_results', 'quiz_direction']:
+    for key in ['quiz_words', 'quiz_index', 'quiz_results', 'quiz_direction', 'quiz_collection']:
         request.session.pop(key, None)
 
     context = {
