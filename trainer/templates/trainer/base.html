@@ -22,6 +22,8 @@
         </button>
         <div class="collapse navbar-collapse" id="navMenu">
             <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+
+                {% if user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'index' %}">Главная</a>
                 </li>
@@ -53,14 +55,46 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'profile' %}">👤 Профиль</a>
-                </li>
                 <li class="nav-item ms-lg-2">
                     <a class="nav-link btn-quiz-nav" href="{% url 'quiz_start' %}">
                         ⚡ Тест
                     </a>
                 </li>
+                <li class="nav-item ms-lg-1">
+                    <a class="nav-link dropdown-toggle" href="#"
+                       data-bs-toggle="dropdown"
+                       style="opacity:.9;">
+                        👤 {{ user.username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'profile' %}">
+                                <i class="bi bi-person me-2 text-success"></i>Мой профиль
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Выйти
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Войти</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-quiz-nav" href="{% url 'register' %}">
+                        Регистрация
+                    </a>
+                </li>
+                {% endif %}
+
             </ul>
         </div>
     </div>
