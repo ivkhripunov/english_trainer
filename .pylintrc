@@ -1,6 +1,6 @@
 [MASTER]
 load-plugins=pylint_django
-django-settings-module=english_trainer.settings
+django-settings-module=config.settings
 ignore=migrations
 
 [FORMAT]
