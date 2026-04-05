@@ -1,6 +1,6 @@
 """Admin configuration for the trainer application."""
 from django.contrib import admin
-from .models import Word, Collection, Language
+from .models import Word, Collection, Language, QuizResult
 
 
 @admin.register(Language)
@@ -28,3 +28,12 @@ class WordAdmin(admin.ModelAdmin):
     list_filter = ['collection__language', 'collection']
     search_fields = ['original', 'translation']
     readonly_fields = ['times_shown', 'times_correct', 'created_at']
+
+
+@admin.register(QuizResult)
+class QuizResultAdmin(admin.ModelAdmin):
+    """Admin interface for QuizResult model."""
+
+    list_display = ['created_at', 'collection', 'score', 'total', 'direction']
+    list_filter = ['collection', 'direction']
+    readonly_fields = ['created_at']

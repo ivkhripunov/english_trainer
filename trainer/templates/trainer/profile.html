@@ -1,0 +1,201 @@
+{% extends "trainer/base.html" %}
+{% block title %}Мой профиль — Тренажёр{% endblock %}
+
+{% block content %}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <div style="width:56px;height:56px;background:var(--clr-primary-l);
+                border-radius:50%;display:flex;align-items:center;
+                justify-content:center;font-size:1.8rem;">
+        👤
+    </div>
+    <div>
+        <h2 class="mb-0" style="font-weight:800;">Мой профиль</h2>
+        <p class="text-muted mb-0" style="font-size:.85rem;">Статистика и история тестов</p>
+    </div>
+</div>
+
+<!-- Блоки статистики -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="stat-block">
+            <div class="stat-label">Слов добавлено</div>
+            <div class="stat-value">{{ total_words }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-block">
+            <div class="stat-label">Тестов пройдено</div>
+            <div class="stat-value">{{ total_quizzes }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-block">
+            <div class="stat-label">Точность (слова)</div>
+            <div class="stat-value">{{ overall_accuracy }}%</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-block">
+            <div class="stat-label">Точность (тесты)</div>
+            <div class="stat-value">{{ quiz_accuracy }}%</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+
+    <!-- Достижения -->
+    <div class="col-md-5">
+        <div class="card h-100">
+            <div class="card-header">🏅 Достижения</div>
+            <div class="card-body p-3">
+                {% if achievements %}
+                <div class="d-flex flex-wrap gap-2">
+                    {% for icon, title, desc in achievements %}
+                    <div class="text-center p-2"
+                         style="background:var(--clr-primary-l);border-radius:10px;
+                                min-width:90px;" title="{{ desc }}">
+                        <div style="font-size:1.8rem;">{{ icon }}</div>
+                        <div style="font-size:.72rem;font-weight:700;
+                                    color:var(--clr-primary-d);">{{ title }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state py-3">
+                    <i class="bi bi-trophy"></i>
+                    <p class="mb-0" style="font-size:.85rem;">
+                        Пока нет достижений — добавь слова и пройди тест!
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Лучшая и сложная подборка -->
+    <div class="col-md-7">
+        <div class="card h-100">
+            <div class="card-header">📊 Подборки</div>
+            <div class="card-body p-3">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div style="background:#f0faf4;border-radius:10px;padding:1rem;">
+                            <div style="font-size:.75rem;font-weight:700;
+                                        text-transform:uppercase;color:var(--clr-muted);">
+                                Лучшая подборка
+                            </div>
+                            {% if best_collection %}
+                                <div class="fw-700 mt-1" style="font-weight:700;">
+                                    {{ best_collection.name }}
+                                </div>
+                                <div class="text-success fw-700">
+                                    {{ best_collection.acc|floatformat:0 }}%
+                                </div>
+                            {% else %}
+                                <div class="text-muted mt-1" style="font-size:.85rem;">
+                                    Нет данных
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div style="background:#fff5f5;border-radius:10px;padding:1rem;">
+                            <div style="font-size:.75rem;font-weight:700;
+                                        text-transform:uppercase;color:var(--clr-muted);">
+                                Сложная подборка
+                            </div>
+                            {% if hardest_collection %}
+                                <div class="fw-700 mt-1" style="font-weight:700;">
+                                    {{ hardest_collection.name }}
+                                </div>
+                                <div class="text-danger fw-700">
+                                    {{ hardest_collection.acc|floatformat:0 }}%
+                                </div>
+                            {% else %}
+                                <div class="text-muted mt-1" style="font-size:.85rem;">
+                                    Нет данных
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div style="font-size:.75rem;font-weight:700;
+                                text-transform:uppercase;color:var(--clr-muted);
+                                margin-bottom:.5rem;">
+                        Всего попыток: {{ total_shown }}
+                    </div>
+                    {% if total_shown > 0 %}
+                    <div class="progress" style="height:8px;">
+                        <div class="progress-bar"
+                             style="width:{{ overall_accuracy }}%;
+                                    background:var(--clr-primary);"></div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- История тестов -->
+<div class="card">
+    <div class="card-header">🕐 История тестов</div>
+    {% if recent_quizzes %}
+    <div class="table-responsive">
+        <table class="table mb-0" style="font-size:.88rem;">
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Подборка</th>
+                    <th>Направление</th>
+                    <th class="text-center">Результат</th>
+                    <th class="text-center">Точность</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for qr in recent_quizzes %}
+                <tr>
+                    <td class="text-muted">
+                        {{ qr.created_at|date:"d.m.Y H:i" }}
+                    </td>
+                    <td>
+                        {% if qr.collection %}
+                            <span class="lang-pill me-1">{{ qr.collection.language }}</span>
+                            {{ qr.collection.name }}
+                        {% else %}
+                            <span class="text-muted fst-italic">Все слова</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted">
+                        {% if qr.direction == 'orig_trans' %}
+                            Ориг → Пер
+                        {% else %}
+                            Пер → Ориг
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        {{ qr.score }} / {{ qr.total }}
+                    </td>
+                    <td class="text-center">
+                        <span class="badge bg-{{ qr.accuracy_color }}">
+                            {{ qr.accuracy }}%
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-clock-history"></i>
+        <p class="mb-2">Тестов пока нет</p>
+        <a href="{% url 'quiz_start' %}" class="btn btn-warning btn-sm">⚡ Начать тест</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
