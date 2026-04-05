@@ -2,7 +2,7 @@
 import random
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, F, FloatField, ExpressionWrapper
 
 from .models import Word, Collection, Language
 from .forms import WordForm, QuizAnswerForm, QuizSettingsForm, CollectionForm, LanguageForm
@@ -32,7 +32,13 @@ def index(request):
     hardest_words = (
         Word.objects.filter(times_shown__gt=0)
         .select_related('collection__language')
-        .order_by('times_correct', '-times_shown')[:3]
+        .annotate(
+            accuracy_rate=ExpressionWrapper(
+                F('times_correct') * 100.0 / F('times_shown'),
+                output_field=FloatField(),
+            )
+        )
+        .order_by('accuracy_rate')[:3]
     )
 
     context = {
