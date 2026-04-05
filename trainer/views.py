@@ -10,7 +10,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import JsonResponse
-from django.db.models import Q, Sum, F, FloatField, ExpressionWrapper
+from django.db.models import Q, Sum, F, FloatField, ExpressionWrapper, Count
 
 from .models import Word, Collection, Language, QuizResult
 from .forms import (
@@ -293,7 +293,19 @@ def language_list(request):
     else:
         form = LanguageForm()
 
-    languages = Language.objects.all()
+    languages = Language.objects.annotate(
+        user_collection_count=Count(
+            'collections',
+            filter=Q(collections__owner=request.user),
+            distinct=True,
+        ),
+        user_word_count=Count(
+            'collections__words',
+            filter=Q(collections__owner=request.user),
+            distinct=True,
+        ),
+    )
+
     context = {'languages': languages, 'form': form}
     return render(request, 'trainer/language_list.html', context)
 
