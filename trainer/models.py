@@ -1,4 +1,5 @@
 """Models for the English trainer application."""
+from django.conf import settings
 from django.db import models
 from django.core.validators import MinLengthValidator
 
@@ -43,6 +44,14 @@ class Language(models.Model):
 class Collection(models.Model):
     """A named set of words for a particular language."""
 
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='collections_owned',
+        verbose_name='Owner',
+    )
     name = models.CharField(
         max_length=200,
         validators=[MinLengthValidator(2)],
@@ -166,6 +175,14 @@ class Word(models.Model):
 class QuizResult(models.Model):
     """Stores the result of a completed quiz session."""
 
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='quiz_results',
+        verbose_name='Owner',
+    )
     collection = models.ForeignKey(
         Collection,
         on_delete=models.SET_NULL,
