@@ -115,7 +115,7 @@
                                 </a>
                                 <span class="text-muted ms-2">— {{ word.translation }}</span>
                             </div>
-                            <span class="badge bg-danger">{{ word.accuracy }}%</span>
+                            <span class="badge bg-{{ word.accuracy_color }}">{{ word.accuracy }}%</span>
                         </div>
                         {% if word.collection %}
                             <div class="text-muted small mt-1">
