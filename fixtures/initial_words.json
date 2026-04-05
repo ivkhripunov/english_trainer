@@ -1,15 +1,34 @@
 [
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "username": "ivan",
+      "password": "pbkdf2_sha256$1200000$SGxiYNpiVnWDe7nXrHsm8r$q4G7/zofK2TKLxVyq3/GV7qdP5iLZln5XlAOiUspHZc=",
+      "first_name": "Иван",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "is_superuser": false,
+      "date_joined": "2026-03-14T10:00:00Z",
+      "last_login": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+
   {"model": "trainer.language", "pk": 1, "fields": {"name": "Английский", "native_name": "English"}},
   {"model": "trainer.language", "pk": 2, "fields": {"name": "Немецкий",   "native_name": "Deutsch"}},
 
-  {"model": "trainer.collection", "pk": 1, "fields": {"name": "Lesson #1",     "description": "Базовая лексика", "language": 1, "created_at": "2026-03-15T10:00:00Z"}},
-  {"model": "trainer.collection", "pk": 2, "fields": {"name": "Unterricht #1", "description": "Grundwortschatz", "language": 2, "created_at": "2026-03-16T10:00:00Z"}},
+  {"model": "trainer.collection", "pk": 1, "fields": {"owner": 1, "name": "Lesson #1",     "description": "Базовая лексика", "language": 1, "created_at": "2026-03-15T10:00:00Z"}},
+  {"model": "trainer.collection", "pk": 2, "fields": {"owner": 1, "name": "Unterricht #1", "description": "Grundwortschatz", "language": 2, "created_at": "2026-03-16T10:00:00Z"}},
 
-  {"model": "trainer.word", "pk": 1, "fields": {"original": "cat",    "translation": "кошка",   "example": "The cat is sleeping on the sofa.",       "collection": 1, "times_shown": 8,  "times_correct": 7, "created_at": "2026-03-15T10:05:00Z"}},
-  {"model": "trainer.word", "pk": 2, "fields": {"original": "house",  "translation": "дом",     "example": "They built a new house last year.",       "collection": 1, "times_shown": 5,  "times_correct": 2, "created_at": "2026-03-15T10:10:00Z"}},
-  {"model": "trainer.word", "pk": 3, "fields": {"original": "run",    "translation": "бежать",  "example": "She likes to run in the morning.",        "collection": 1, "times_shown": 10, "times_correct": 6, "created_at": "2026-03-15T10:15:00Z"}},
+  {"model": "trainer.word", "pk": 1, "fields": {"original": "cat",   "translation": "кошка",  "example": "The cat is sleeping on the sofa.",   "collection": 1, "times_shown": 8,  "times_correct": 7, "created_at": "2026-03-15T10:05:00Z"}},
+  {"model": "trainer.word", "pk": 2, "fields": {"original": "house", "translation": "дом",    "example": "They built a new house last year.",   "collection": 1, "times_shown": 5,  "times_correct": 2, "created_at": "2026-03-15T10:10:00Z"}},
+  {"model": "trainer.word", "pk": 3, "fields": {"original": "run",   "translation": "бежать", "example": "She likes to run in the morning.",    "collection": 1, "times_shown": 10, "times_correct": 6, "created_at": "2026-03-15T10:15:00Z"}},
 
-  {"model": "trainer.word", "pk": 4, "fields": {"original": "Hund",   "translation": "собака",  "example": "Der Hund schläft auf dem Boden.",         "collection": 2, "times_shown": 6,  "times_correct": 5, "created_at": "2026-03-16T10:05:00Z"}},
-  {"model": "trainer.word", "pk": 5, "fields": {"original": "Buch",   "translation": "книга",   "example": "Das Buch liegt auf dem Tisch.",           "collection": 2, "times_shown": 4,  "times_correct": 1, "created_at": "2026-03-16T10:10:00Z"}},
-  {"model": "trainer.word", "pk": 6, "fields": {"original": "gehen",  "translation": "идти",    "example": "Wir gehen jeden Tag spazieren.",          "collection": 2, "times_shown": 9,  "times_correct": 7, "created_at": "2026-03-16T10:15:00Z"}}
+  {"model": "trainer.word", "pk": 4, "fields": {"original": "Hund",  "translation": "собака", "example": "Der Hund schläft auf dem Boden.",     "collection": 2, "times_shown": 6,  "times_correct": 5, "created_at": "2026-03-16T10:05:00Z"}},
+  {"model": "trainer.word", "pk": 5, "fields": {"original": "Buch",  "translation": "книга",  "example": "Das Buch liegt auf dem Tisch.",       "collection": 2, "times_shown": 4,  "times_correct": 1, "created_at": "2026-03-16T10:10:00Z"}},
+  {"model": "trainer.word", "pk": 6, "fields": {"original": "gehen", "translation": "идти",   "example": "Wir gehen jeden Tag spazieren.",      "collection": 2, "times_shown": 9,  "times_correct": 7, "created_at": "2026-03-16T10:15:00Z"}}
 ]

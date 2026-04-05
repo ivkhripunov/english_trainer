@@ -79,14 +79,11 @@ def logout_view(request):
 
 # ── Home ──────────────────────────────────────────────────────────────────────
 
+@login_required
 def index(request):
     """Render the home page with statistics for the current user."""
-    if request.user.is_authenticated:
-        word_qs = Word.objects.filter(collection__owner=request.user)
-        collection_qs = Collection.objects.filter(owner=request.user)
-    else:
-        word_qs = Word.objects.all()
-        collection_qs = Collection.objects.all()
+    word_qs = Word.objects.filter(collection__owner=request.user)
+    collection_qs = Collection.objects.filter(owner=request.user)
 
     total_words = word_qs.count()
     total_collections = collection_qs.count()
