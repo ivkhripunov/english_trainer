@@ -164,7 +164,8 @@ def api_suggest_translation(request):
         + urllib.parse.urlencode({'q': word, 'langpair': lang_pair})
     )
     try:
-        with urllib.request.urlopen(url, timeout=API_TIMEOUT) as response:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=API_TIMEOUT) as response:
             data = json.loads(response.read().decode())
         translated = data.get('responseData', {}).get('translatedText', '')
         if not translated or translated.upper() == word.upper():
@@ -183,7 +184,8 @@ def api_suggest_example(request):
 
     url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{urllib.parse.quote(word)}'
     try:
-        with urllib.request.urlopen(url, timeout=API_TIMEOUT) as response:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=API_TIMEOUT) as response:
             data = json.loads(response.read().decode())
 
         example = ''
