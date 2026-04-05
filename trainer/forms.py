@@ -1,6 +1,43 @@
 """Forms for the English trainer application."""
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 from .models import Word, Collection, Language
+
+
+class RegisterForm(UserCreationForm):
+    """Form for user registration with email field."""
+
+    email = forms.EmailField(
+        required=False,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'example@mail.ru (необязательно)',
+        }),
+        label='Email',
+    )
+
+    class Meta:
+        """Meta options for RegisterForm."""
+
+        model = User
+        fields = ['username', 'email', 'password1', 'password2']
+
+    def __init__(self, *args, **kwargs):
+        """Apply Bootstrap classes to all fields."""
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            if field_name != 'email':
+                field.widget.attrs['class'] = 'form-control'
+        self.fields['username'].widget.attrs['placeholder'] = 'Имя пользователя'
+        self.fields['username'].help_text = ''
+        self.fields['password1'].widget.attrs['placeholder'] = 'Пароль'
+        self.fields['password1'].help_text = ''
+        self.fields['password2'].widget.attrs['placeholder'] = 'Повторите пароль'
+        self.fields['password2'].help_text = ''
+        self.fields['username'].label = 'Имя пользователя'
+        self.fields['password1'].label = 'Пароль'
+        self.fields['password2'].label = 'Повторите пароль'
 
 
 class LanguageForm(forms.ModelForm):
@@ -114,6 +151,14 @@ class WordForm(forms.ModelForm):
             'collection': 'Подборка (необязательно)',
         }
 
+    def __init__(self, *args, user=None, **kwargs):
+        """Filter collections queryset by current user."""
+        super().__init__(*args, **kwargs)
+        if user and user.is_authenticated:
+            self.fields['collection'].queryset = Collection.objects.filter(
+                owner=user
+            ).select_related('language')
+
     def clean_original(self):
         """Validate the original word field."""
         value = self.cleaned_data.get('original', '').strip()
@@ -199,7 +244,12 @@ class QuizSettingsForm(forms.Form):
         label='Направление перевода',
     )
 
-    def __init__(self, *args, **kwargs):
-        """Populate the collection queryset dynamically."""
+    def __init__(self, *args, user=None, **kwargs):
+        """Populate the collection queryset filtered by user."""
         super().__init__(*args, **kwargs)
-        self.fields['collection'].queryset = Collection.objects.select_related('language')
+        if user and user.is_authenticated:
+            self.fields['collection'].queryset = Collection.objects.filter(
+                owner=user
+            ).select_related('language')
+        else:
+            self.fields['collection'].queryset = Collection.objects.select_related('language')
